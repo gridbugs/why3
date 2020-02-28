@@ -40,7 +40,9 @@ why3.conf
 /distrib
 /why3regtests.err
 /why3regtests.out
+.merlin
 /src/jessie/.merlin
+/why3*.install
 /_build
 /public
 
@@ -62,12 +64,8 @@ why3.conf
 /examples/tests/*.out
 
 # /bin/
-/bin/why3.byte
-/bin/why3.opt
-/bin/why3
-/bin/isabelle_client.opt
-/bin/isabelle_client.byte
-/bin/isabelle_client
+/bin/main.exe
+/bin/isabelle_client.exe
 
 # /doc/
 /doc/*whizzy*
@@ -301,3 +299,10 @@ pvsbin/
 
 /trash
 trywhy3.tar.gz
+/_build/
+/dune_done
+/dune-workspace
+/coq.dune
+/isabelle.dune
+/pvs.dune
+/install.dune

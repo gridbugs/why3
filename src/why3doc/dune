@@ -1,0 +1,10 @@
+(executable
+        (public_name why3doc)
+        (name doc_main)
+        (modules doc_html doc_def doc_lexer doc_main)
+        (libraries why3)
+        (flags -linkall)
+        (package why3)
+)
+
+(ocamllex doc_lexer)

@@ -80,8 +80,8 @@ val set_load_default_plugins: bool -> config -> config
 val set_load_default_config: bool -> config -> config
 (** Set if the default strategies should be automatically generated *)
 
-val libdir: main -> string
-val datadir: main -> string
+val libdir: main -> string list
+val datadir: main -> string list
 val loadpath: main -> string list
 val set_loadpath : main -> string list -> main
 val timelimit: main -> int
@@ -94,7 +94,6 @@ val default_editor: main -> string
 val set_default_editor: main -> string -> main
 
 val plugins : main -> string list
-val pluginsdir : main -> string
 val set_plugins : main -> string list -> main
 val add_plugin : main -> string -> main
 val load_plugins : main -> unit

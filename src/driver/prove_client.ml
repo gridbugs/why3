@@ -122,7 +122,7 @@ let connect_internal () =
     ("why3server." ^ string_of_int (Unix.getpid ()) ^ ".sock") *)
     Filename.temp_file "why3server" "sock"
   in
-  let exec = Filename.concat Config.libdir "why3server" in
+  let exec = Sysutil.lookup_in_dirs "why3server" Config.libdir in
   let pid =
     (* use this version for debugging the C code
     Unix.create_process "valgrind"

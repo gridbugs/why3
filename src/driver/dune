@@ -1,0 +1,9 @@
+(ocamllex driver_lexer sexp)
+(menhir (modules driver_parser)(infer false))
+
+(library
+     (name why3_driver)
+     (public_name why3.driver)
+     (flags -open Why3_util -open Why3_core -w A-4-9-41-44-45-50-52@5@8@48)
+     (libraries why3.util why3.core num unix)
+)

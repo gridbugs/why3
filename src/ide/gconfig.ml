@@ -411,8 +411,9 @@ let why_icon = ref !image_default
 let image ?size f =
   let main = get_main () in
   let n =
-    Filename.concat (datadir main)
+    Sysutil.lookup_in_dirs
       (Filename.concat "images" (f^".png"))
+      (datadir main)
   in
   try (
   match size with
@@ -457,7 +458,7 @@ let iconname_cleaning = ref ""
 
 let iconsets () : (string * Why3.Rc.family) =
   let main = get_main () in
-  let dir = Filename.concat (datadir main) "images" in
+  let dir = Sysutil.lookup_in_dirs "images" (datadir main) in
   let files = Sys.readdir dir in
   let f = ref [] in
   Array.iter
@@ -666,7 +667,7 @@ let show_about_window ~parent () =
                 "Makarius Wenzel";
                ]
       ~copyright:"Copyright 2010-2020 Inria, CNRS, Paris-Sud University"
-      ~license:("See file " ^ Filename.concat Config.datadir "LICENSE")
+      ~license:("See file " ^ Sysutil.lookup_in_dirs "LICENSE" Config.datadir)
       ~website:"http://why3.lri.fr/"
       ~website_label:"http://why3.lri.fr/"
       ~version:Config.version

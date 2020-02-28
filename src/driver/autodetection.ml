@@ -191,9 +191,11 @@ let next_priority =
 
 let highest_priority = 0
 
+let get_provers_detection_data_conf main =
+  Sysutil.lookup_in_dirs "provers-detection-data.conf" (Whyconf.datadir main)
+
 let read_auto_detection_data env main =
-  let filename = Filename.concat (Whyconf.datadir main)
-    "provers-detection-data.conf" in
+  let filename = get_provers_detection_data_conf main in
   try
     let rc = Rc.from_file filename in
     let shortcuts =
@@ -207,8 +209,7 @@ let read_auto_detection_data env main =
         Loc.errorm "provers-detection-data.conf not found at %s@." filename
 
 let read_editors main =
-  let filename = Filename.concat (Whyconf.datadir main)
-    "provers-detection-data.conf" in
+  let filename = get_provers_detection_data_conf main in
   try
     let rc = Rc.from_file filename in
     List.fold_left (fun editors (id, section) ->
@@ -436,8 +437,8 @@ let generate_auto_strategies env =
 let check_support_library data ver =
   let cmd_regexp = Re.Str.regexp "%\\(.\\)" in
   let replace s = match Re.Str.matched_group 1 s with
-    | "l" -> Config.libdir
-    | "d" -> Config.datadir
+    | "l" -> List.hd (List.rev Config.libdir)
+    | "d" -> List.hd (List.rev Config.datadir)
     | c -> c in
   let sl = Re.Str.global_substitute cmd_regexp replace data.support_library in
   try

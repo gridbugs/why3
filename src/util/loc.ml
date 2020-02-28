@@ -66,8 +66,8 @@ let extract (b,e) =
   let lc = e.pos_cnum - b.pos_bol in
   (f,l,fc,lc)
 
-let compare = Pervasives.compare
-let equal = Pervasives.(=)
+let compare = Stdlib.compare
+let equal = Stdlib.(=)
 let hash = Hashtbl.hash
 
 let gen_report_position fmt (f,l,b,e) =

@@ -45,6 +45,7 @@ depends: [
   "ocamlfind" {build}
   "menhir" {>= "20151112"}
   "num"
+  "dune" {>= "1.11" }
 ]
 
 depopts: [

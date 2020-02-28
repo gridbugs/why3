@@ -1,0 +1,29 @@
+(ocamllex rc lexlib json_lexer)
+(menhir (modules json_parser))
+
+(library
+      (name why3_util)
+      (public_name why3.util)
+      (modules
+           config bigInt util opt lists strings
+           pp extmap extset exthtbl weakhtbl
+           hashcons wstdlib exn_printer
+           json_base json_parser json_lexer
+           debug loc lexlib print_tree
+           cmdline warning sysutil rc plugin bigInt number vector pqueue
+           mlmpfr_wrapper constant diffmap sites_info getopt mysexplib
+       )
+       (flags -w A-4-9-41-44-45-50-52@5@8@48)
+       (libraries num dynlink str unix findlib.dynload findlib dune-site dune-site.plugins
+       (select mlmpfr_wrapper.ml from
+          (mlmpfr -> mlmpfr_wrapper.real.ml)
+          (       -> mlmpfr_wrapper.dummy.ml)
+       )
+       (select mysexplib.ml from
+          (sexplib -> mysexplib.real.ml)
+          (        -> mysexplib.dummy.ml)
+       )
+       )
+)
+
+(generate_sites_module (module sites_info) (sourceroot) (sites why3) (plugins (why3 plugins)))

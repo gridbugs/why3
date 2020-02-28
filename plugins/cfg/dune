@@ -1,0 +1,20 @@
+(ocamllex cfg_lexer)
+(menhir (modules ../../src/parser/parser_common cfg_parser)
+ (merge_into cfg_parser)
+ (infer false)
+ (flags --table --explain --strict --external-tokens Cfg_tokens)
+  ;table is needed otherwise we have a segfault
+)
+
+(library
+ (public_name why3.plugin.cfg)
+ (name why3_plugin_cfg)
+ (libraries why3)
+)
+
+(plugin
+ (name why3-plugin-cfg)
+ (libraries why3.plugin.cfg)
+ (site (why3 plugins))
+ (package why3)
+)

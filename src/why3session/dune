@@ -1,0 +1,10 @@
+(executable
+        (public_name why3session)
+        (name why3session_main)
+        (modules why3session_lib why3session_info
+                 why3session_html why3session_latex why3session_update
+                 why3session_main)
+       (libraries why3)
+       (flags -linkall)
+       (package why3)
+)

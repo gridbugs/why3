@@ -207,7 +207,7 @@ let env, gconfig =
 
 let (why_lang, any_lang, why3py_lang, why3c_lang) =
   let main = Whyconf.get_main gconfig.config in
-  let load_path = Filename.concat (Whyconf.datadir main) "lang" in
+  let load_path = Sysutil.lookup_in_dirs "lang" (Whyconf.datadir main) in
   let languages_manager =
     GSourceView.source_language_manager ~default:true
   in

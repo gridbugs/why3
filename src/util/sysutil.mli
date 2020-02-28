@@ -90,3 +90,6 @@ val uniquify : string -> string
 (** find filename that doesn't exist based on the given filename.
     Be careful the file can be taken after the return of this function.
 *)
+
+exception Lookup_in_dirs_failed of string * string list
+val lookup_in_dirs: string -> string list -> string

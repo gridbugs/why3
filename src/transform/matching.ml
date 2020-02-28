@@ -154,7 +154,7 @@ type construction =
 module C = struct
   type t = construction
   let compare t1 t2 =
-    let (--) = Pervasives.compare in
+    let (--) = Stdlib.compare in
     match t1, t2 with
     | Crigid vs1, Crigid vs2 -> vs_compare vs1 vs2
     | Cbound n1, Cbound n2 | Ccase n1, Ccase n2 -> n1 -- n2
@@ -265,7 +265,7 @@ type 'i instruction =
 
 module IL = struct
   type t = int list
-  let compare = Pervasives.compare
+  let compare = Stdlib.compare
 end
 module MIL = Extmap.Make(IL)
 
@@ -1156,7 +1156,7 @@ let compile id rigid_tv rigid_vs tp =
     let add x =
       match !acc with
       | None -> acc := Some x
-      | Some y -> acc := Some (join_code_points Pervasives.compare x y)
+      | Some y -> acc := Some (join_code_points Stdlib.compare x y)
     in
     let rec agg_term t = match t.t_node with
       | Tbinop (Tand,a,b) -> agg_term a; agg_term b
@@ -1176,7 +1176,7 @@ let compile id rigid_tv rigid_vs tp =
         agg_term a;
         let acc = Opt.get !acc in
         Format.printf "CODE: %a@." (pp_code Pp.int) acc;
-        begin match run_match Pervasives.compare acc !mty !mv b with
+        begin match run_match Stdlib.compare acc !mty !mv b with
         | Some (id,mty,mv) ->
           Format.printf "Match rule %d@." id;
           Mtv.iter (fun tv ty -> Format.printf

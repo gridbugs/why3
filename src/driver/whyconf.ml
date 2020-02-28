@@ -46,7 +46,7 @@ let why3_regexp_of_string s = (* define a regexp in why3 *)
 (* lib and shared dirs *)
 
 let default_loadpath =
-  [ Filename.concat Config.datadir "stdlib" ]
+  [ Sysutil.lookup_in_dirs "stdlib" Config.datadir]
 
 let default_conf_file =
   match Config.localdir with
@@ -185,8 +185,8 @@ let set_strategies rc strategies =
 (** Main record *)
 
 type main = {
-  libdir   : string;      (* "/usr/local/lib/why/" *)
-  datadir  : string;      (* "/usr/local/share/why/" *)
+  libdir   : string list;      (* "/usr/local/lib/why/" *)
+  datadir  : string list;      (* "/usr/local/share/why/" *)
   loadpath  : string list;  (* "/usr/local/lib/why/stdlib" *)
   stdlib  : bool;
   (* add the standard library in the loadpath (default true) *)
@@ -209,12 +209,12 @@ type main = {
 
 let libdir m =
   try
-    Sys.getenv "WHY3LIB"
+    [Sys.getenv "WHY3LIB"]
   with Not_found -> m.libdir
 
 let datadir m =
   try
-    let d = Sys.getenv "WHY3DATA" in
+    let d = [Sys.getenv "WHY3DATA"] in
 (*
     eprintf "[Info] datadir set using WHY3DATA='%s'@." d;
 *)
@@ -266,27 +266,13 @@ let add_plugin m p =
   then m
   else { m with plugins = List.rev (p::(List.rev m.plugins))}
 
-let pluginsdir m = Filename.concat m.libdir "plugins"
-
-let plugins_auto_detection main =
-  let dir = pluginsdir main in
-  let ext = if Dynlink.is_native then ".cmxs" else ".cmo" in
-  let files = try Sys.readdir dir with Sys_error _ -> [||] in
-  let fold acc p =
-    let open Filename in
-    if extension p = ext then
-      concat dir (chop_extension p) :: acc
-    else
-      acc in
-  Array.fold_left fold [] files
-
 let load_plugins main =
   let load x =
     try Plugin.load x
     with exn ->
       Format.eprintf "%s cannot be loaded: %a@." x
         Exn_printer.exn_printer exn in
-  if main.load_default_plugins then List.iter load (plugins_auto_detection main);
+  if main.load_default_plugins then Plugin.autoload_plugins ();
   List.iter load main.plugins
 
 type config = {
@@ -320,9 +306,9 @@ let empty_main =
 let set_main rc main =
   let section = empty_section in
   let section = set_int section "magic" magicnumber in
-  let section = set_string ~default:empty_main.libdir
+  let section = set_stringl ~default:empty_main.libdir
     section "libdir" main.libdir in
-  let section = set_string ~default:empty_main.datadir
+  let section = set_stringl ~default:empty_main.datadir
       section "datadir" main.datadir in
   let section = set_bool ~default:true section "stdlib" main.stdlib in
   let section = set_bool ~default:true section "load_default_plugins" main.load_default_plugins in
@@ -585,8 +571,8 @@ let load_strategy strategies section =
 let load_main dirname section =
   if get_int ~default:0 section "magic" <> magicnumber then
     raise WrongMagicNumber;
-  { libdir    = get_string ~default:empty_main.libdir section "libdir";
-    datadir   = get_string ~default:empty_main.datadir section "datadir";
+  { libdir    = get_stringl ~default:empty_main.libdir section "libdir";
+    datadir   = get_stringl ~default:empty_main.datadir section "datadir";
     loadpath  = List.map (Sysutil.concat dirname)
         (get_stringl ~default:[] section "loadpath");
     stdlib = get_bool ~default:true section "stdlib";
@@ -1010,6 +996,7 @@ module Args = struct
     let config = apply_not_default set_load_default_plugins opt_load_default_plugins config in
     let main = get_main config in
     load_plugins main;
+    Plugin.autoload_plugins ();
     Debug.Args.set_flags_selected ();
     if Debug.Args.option_list () then exit 0;
     let lp = List.rev_append !opt_loadpath (loadpath main) in
@@ -1031,7 +1018,7 @@ end
 
 let absolute_driver_file main s =
   if Sys.file_exists s || String.contains s '/' || String.contains s '.' then s
-  else Filename.concat main.datadir (Filename.concat "drivers" (s ^ ".drv"))
+  else Sysutil.lookup_in_dirs (Filename.concat "drivers" (s ^ ".drv")) main.datadir
 
 let load_driver_raw main env file extras =
   let file = absolute_driver_file main file in

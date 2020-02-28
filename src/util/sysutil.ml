@@ -210,3 +210,14 @@ let uniquify file =
   done;
   let file = name ^ "_" ^ (string_of_int !i) ^ ext in
   file
+
+exception Lookup_in_dirs_failed of string * string list
+
+let rec lookup_in_dirs file alldirs = function
+  | [] -> raise (Lookup_in_dirs_failed(file,alldirs))
+  | d::dirs ->
+      let f = Filename.concat d file in
+      if Sys.file_exists f then f
+      else lookup_in_dirs file alldirs dirs
+
+let lookup_in_dirs file dirs = lookup_in_dirs file dirs dirs

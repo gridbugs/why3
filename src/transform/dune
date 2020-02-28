@@ -1,0 +1,26 @@
+(library
+     (name why3_transform)
+     (public_name why3.transform)
+     (modules
+          simplify_formula inlining split_goal
+                args_wrapper detect_polymorphism reduction_engine compute
+                eliminate_definition eliminate_algebraic
+                abstract_quantifiers eliminate_unknown_types
+                eliminate_unknown_lsymbols eliminate_symbol
+                eliminate_inductive eliminate_let eliminate_if
+                libencoding discriminate encoding encoding_select
+                encoding_guards_full encoding_tags_full
+                encoding_guards encoding_tags encoding_twin
+                encoding_sort simplify_array filter_trigger
+                abstraction close_epsilon lift_epsilon
+                eliminate_epsilon intro_projections_counterexmp
+                instantiate_predicate smoke_detector
+                prop_curry eliminate_literal
+                generic_arg_trans_utils case apply subst
+                introduction ind_itp destruct cut congruence
+                intro_vc_vars_counterexmp prepare_for_counterexmp
+                induction induction_pr matching reflection
+     )
+     (flags -open Why3_util -open Why3_core -open Why3_mlw -open Why3_parser -open Why3_extract -w A-4-9-41-44-45-50-52@5@8@48)
+     (libraries why3.util why3.core why3.mlw why3.parser why3.extract num)
+)

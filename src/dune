@@ -1,0 +1,14 @@
+(library
+ (public_name why3)
+ (modules why3)
+ (libraries why3.util why3.core why3.driver why3.parser why3.transform why3.printer why3.session why3.extract)
+)
+
+; (executable
+;  (name discover)
+;  (modules discover)
+;  (libraries dune.configurator))
+
+; (rule
+;  (targets config.h)
+;  (action (run ./discover.exe)))

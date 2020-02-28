@@ -1,7 +1,7 @@
 BENCH ?= no
 
 ifeq ($(BENCH),yes)
-  WHY3=../../bin/why3.opt
+  WHY3=../../bin/why3
 else
   ifeq ($(BINDIR),)
     WHY3=why3

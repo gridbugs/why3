@@ -13,38 +13,9 @@ has_infer=`sed -n -e 's/INFERLIB *= *\([^ ]\+\)/\1/p' share/Makefile.config`
 
 shopt -s nullglob
 
-suffix=
-only=
-
-while [ $# != 0 ]; do
-    case "$1" in
-        "-suffix")
-            suffix="$2"
-            shift 2
-            ;;
-        "-only")
-            only="$2"
-            shift 2
-            ;;
-        *)
-            echo "Usage: $0 [-suffix s] [-only category]"
-            echo "The suffix for calling bin/why3 and either '.opt' or '.byte' or ''."
-            echo "The category can be used to select only a specific bench test"
-            echo "and is one of the following:"
-            echo "  badfiles drivers execution extraction goodfiles invalidgoals list"
-            echo "  mlwprinter rac realizations replay replay-without-shapes stdlib"
-            echo "  validgoals validsplitgoals."
-            exit 1
-    esac
-done
-
-enabled () {
-    test -z "$only" -o "$only" = "$1"
-}
-
 # TODO: remove the hack about int.mlw once it has become builtin
 goods () {
-    pgm="bin/why3$suffix prove"
+    pgm="bin/why3 prove"
     ERROR=
     test -d $1 || exit 1
     rm -f bench_errors
@@ -76,7 +47,7 @@ goods () {
 }
 
 plugins () {
-    pgm="bin/why3$suffix prove"
+    pgm="bin/why3 prove"
     test -d $1 || exit 1
     for f in $1/*.$3 ; do
 	printf "  $f... "
@@ -90,7 +61,7 @@ plugins () {
 }
 
 bads () {
-    pgm="bin/why3$suffix prove"
+    pgm="bin/why3 prove"
     test -d $1 || exit 1
     for f in $1/*.[wm][hl][yw] ; do
 	printf "  $f... "
@@ -105,7 +76,7 @@ bads () {
 }
 
 warns () {
-    pgm="bin/why3$suffix prove"
+    pgm="bin/why3 prove"
     test -d $1 || exit 1
     rm -f bench_errors
     for f in $1/*.[wm][hl][yw] ; do
@@ -125,7 +96,7 @@ warns () {
 }
 
 drivers () {
-    pgm="bin/why3$suffix prove"
+    pgm="bin/why3 prove"
     test -d $1 || exit 1
     for f in $1/*.drv; do
         if [[ $f == drivers/ocaml*.drv ]]; then continue; fi
@@ -143,8 +114,8 @@ drivers () {
 }
 
 valid_goals () {
-    bin/why3$suffix --list-provers | grep -q Alt-Ergo || return 0
-    pgm="bin/why3$suffix prove"
+    bin/why3  --list-provers | grep -q Alt-Ergo || return 0
+    pgm="bin/why3 prove"
     test -d $1 || exit 1
     for f in $1/*.mlw; do
 	printf "  $f... "
@@ -159,8 +130,8 @@ valid_goals () {
 }
 
 invalid_goals () {
-    bin/why3$suffix --list-provers | grep -q Alt-Ergo || return 0
-    pgm="bin/why3$suffix prove"
+    bin/why3  --list-provers | grep -q Alt-Ergo || return 0
+    pgm="bin/why3 prove"
     test -d $1 || exit 1
     for f in $1/*.mlw; do
 	printf "  $f... "
@@ -176,7 +147,7 @@ invalid_goals () {
 }
 
 replay () {
-    pgm="bin/why3$suffix replay"
+    pgm="bin/why3 replay"
     test -d $1 || exit 1
     for f in $1/*/; do
         printf "  $f... "
@@ -215,10 +186,9 @@ replay_without_shape () {
 }
 
 execute () {
-    pgm="bin/why3$suffix execute"
-    echo -n "  ${@:1}... "
-    # Run why3execute and discard warnings from the reduction engine
-    if $pgm "$@" > /dev/null 2> >(grep -v '$warning: reduction of term'); then
+    pgm="bin/why3 execute"
+    printf "  $1 $2... "
+    if $pgm $1 $2 > /dev/null; then
         echo "ok"
     else
         echo "execution test failed! $?"
@@ -229,7 +199,7 @@ execute () {
 }
 
 extract () {
-    pgm="bin/why3$suffix extract"
+    pgm="bin/why3 extract"
     dir=$1
     shift
     for f in $dir/*.mlw; do
@@ -377,7 +347,7 @@ extract_and_test_c () {
 }
 
 list_stuff () {
-    pgm="bin/why3$suffix"
+    pgm="bin/why3 "
     printf '  %s ' "$1"
     if $pgm $1 > /dev/null; then
         echo "ok"

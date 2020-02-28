@@ -33,7 +33,7 @@ type mpfr_rnd_t =
   | Toward_Plus_Infinity
   | Toward_Minus_Infinity
   | Away_From_Zero
-  | Faithful
+  | Faithful [@ if MLMPFR_VERSION > "4"]
 
 type sign = Positive | Negative
 

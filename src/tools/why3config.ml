@@ -33,9 +33,6 @@ let set_oref r = (fun s -> r := Some s)
 
 let prover_bins = Queue.create ()
 
-let plugins = Queue.create ()
-let add_plugin x = Queue.add x plugins
-
 let spec =
   let open Getopt in
   [ Key ('C', "config"), Hnd1 (AString, set_oref conf_file),
@@ -53,8 +50,6 @@ let spec =
     " write in why3.conf the default config for provers, shortcut, strategies, and plugins, instead of loading it at startup";
     KLong "list-prover-families", Hnd0 (fun () -> opt_list_prover_families := true),
     " list known prover families";
-    KLong "install-plugin", Hnd1 (AString, add_plugin),
-    "<file> copy a plugin to the current library directory";
     KLong "dont-save", Hnd0 (fun () -> save := false),
     " do not modify the config file";
     Debug.Args.desc_debug;
@@ -79,32 +74,6 @@ let anon_file x = raise (Getopt.GetoptFailure (sprintf "unexpected argument: %s"
 
 let add_prover_binary config (id,shortcut,file) =
   Autodetection.add_prover_binary config id shortcut file
-
-let install_plugin main p =
-  begin match Plugin.check_plugin p with
-    | Plugin.Plubad ->
-        Debug.dprintf Plugin.debug "Unknown extension (.cmo|.cmxs): %s@." p;
-        raise Exit
-    | Plugin.Pluother ->
-        Debug.dprintf Plugin.debug
-          "The plugin %s cannot be used with this kind of compilation@." p;
-        raise Exit
-    | Plugin.Plufail exn ->
-        eprintf "The plugin %s dynlink failed:@.%a@."
-          p Exn_printer.exn_printer exn;
-        raise Exit
-    | Plugin.Plugood ->
-        eprintf "== Found %s ==@." p
-  end;
-  let base = Filename.basename p in
-  let plugindir = Whyconf.pluginsdir main in
-  if not (Sys.file_exists plugindir) then begin
-    eprintf "Error: plugin directory %s not found.@." plugindir;
-    raise Exit
-  end;
-  let target = (Filename.concat plugindir base) in
-  if p <> target then Sysutil.copy_file p target;
-  Whyconf.add_plugin main (Filename.chop_extension target)
 
 (*  Activate the fallback to auto mode on error *)
 let auto_fallback () =
@@ -149,7 +118,6 @@ let main () =
      !libdir in *)
   (* let main = Opt.fold main (fun d -> {main with datadir = d})
      !datadir in *)
-  let main = try Queue.fold install_plugin main plugins with Exit -> exit 1 in
   let config = set_main config main in
   let config =
     try Queue.fold add_prover_binary config prover_bins with Exit -> exit 1 in

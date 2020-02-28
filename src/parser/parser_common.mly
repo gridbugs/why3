@@ -185,7 +185,7 @@
 
   let re_pat pat d = { pat with pat_desc = d }
 
-  let rec simplify_let_pattern ?loc kind d pat e =
+  let simplify_let_pattern ?loc kind d pat e =
     let cast e ty = { e with expr_desc = Ecast (e,ty) } in
     let rec unfold gh d p = match p.pat_desc with
       | Pparen p | Pscope (_,p) -> unfold gh d p
@@ -203,12 +203,12 @@
 (* Tokens *)
 
 %token <string> LIDENT CORE_LIDENT UIDENT CORE_UIDENT
-%token <Number.int_constant> INTEGER
+%token <Why3_util.Number.int_constant> INTEGER
 %token <string> OP1 OP2 OP3 OP4 OPPREF
-%token <Number.real_constant> REAL
+%token <Why3_util.Number.real_constant> REAL
 %token <string> STRING
 %token <string> ATTRIBUTE
-%token <Loc.position> POSITION
+%token <Why3_util.Loc.position> POSITION
 %token <string> QUOTE_LIDENT
 %token <string> RIGHTSQ_QUOTE (* ]'' *)
 %token <string> RIGHTPAR_QUOTE (* )'spec *)
@@ -294,13 +294,6 @@ See also `plugins/cfg/cfg_parser.mly`
 | THEORY attrs(uident_nq)  { $2 }
 | MODULE attrs(uident_nq)  { $2 }
 
-
-%public module_decl_parsing_only:
-| scope_head_parsing_only module_decl_parsing_only* END
-    { let loc,import,qid = $1 in (Dscope(loc,import,qid,$2))}
-| IMPORT uqualid { (Dimport $2) }
-| d = pure_decl | d = prog_decl | d = meta_decl { d }
-| use_clone_parsing_only { $1 }
 
 %public scope_head_parsing_only:
 | SCOPE boption(IMPORT) attrs(uident_nq)

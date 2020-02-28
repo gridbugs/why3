@@ -1,0 +1,21 @@
+(ocamllex xml strategy_parser)
+
+(library
+    (name why3_session)
+    (public_name why3.session)
+    (modules
+       compress xml termcode session_itp
+       strategy strategy_parser controller_itp
+       server_utils itp_communication
+       itp_server json_util unix_scheduler
+    )
+   (libraries why3.util why3.core num why3.transform why3.driver why3.parser why3.mlw
+           (select compress.ml from
+             (zip -> compress.z.ml)
+             (         -> compress.none.ml))
+   )
+   (flags -open Why3_util -open Why3_core -open Why3_transform -open Why3_driver -open Why3_parser -open Why3_mlw -w A-4-9-41-44-45-50-52@5@8@48)
+)
+
+
+(include_subdirs no)

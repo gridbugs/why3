@@ -19,8 +19,8 @@ let remove_quotes s = String.sub s 1 (String.length s - 2)
 exception UnsupportedRole of string
 
 let () = Why3.Exn_printer.register (fun fmt exn -> match exn with
-  | UnsupportedRole s -> Format.fprintf fmt "unsupported role %s" s
   | Error -> Format.fprintf fmt "syntax error"
+  | UnsupportedRole s -> Format.fprintf fmt "unsupported role %s" s
   | _ -> raise exn)
 %}
 

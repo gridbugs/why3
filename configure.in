@@ -212,8 +212,8 @@ fi
 OCAMLVERSION=`$OCAMLC -v | sed -n -e 's|.*version *\(.*\)$|\1|p'`
 echo "ocaml version is $OCAMLVERSION"
 
-AX_VERSION_GE([$OCAMLVERSION], 4.05.0, [],
-  [AC_MSG_ERROR(You need Objective Caml 4.05.0 or higher.)])
+AX_VERSION_GE([$OCAMLVERSION], 4.08.0, [],
+  [AC_MSG_ERROR(You need Objective Caml 4.08.0 or higher.)])
 
 # Ocaml library path
 # old way: OCAMLLIB=`$OCAMLC -v | tail -1 | cut -f 4 -d ' ' | tr -d '\\r'`
@@ -318,6 +318,12 @@ fi
 MENHIRVERSION=`$MENHIR --version | sed -n -e 's,.*version *\(.*\)$,\1,p'`
 AX_VERSION_GE([$MENHIRVERSION], 20151112, [],
   [AC_MSG_ERROR(You need Menhir 20151112 or higher.)])
+
+
+AC_CHECK_PROG(DUNE,dune,dune,no)
+if test "$DUNE" = no ; then
+	AC_MSG_ERROR(Cannot find dune.)
+fi
 
 if test "$enable_ocamlfind" != yes; then
    OCAMLFIND=no
@@ -1180,18 +1186,13 @@ AC_SUBST(enable_relocation)
 # Finally create the Makefile from Makefile.in
 AC_CONFIG_FILES(Makefile)
 AC_CONFIG_FILES(src/config.sh)
-AC_CONFIG_FILES(lib/why3/META)
-AC_CONFIG_FILES(.merlin)
+AC_CONFIG_FILES(dune-workspace)
 AC_CONFIG_FILES(src/jessie/Makefile)
-AC_CONFIG_FILES(src/jessie/.merlin)
 AC_CONFIG_FILES(lib/coq/version lib/pvs/version)
 AC_CONFIG_COMMANDS([chmod],
 chmod a-w Makefile src/jessie/Makefile;
 chmod a-w src/config.sh;
-chmod a-w lib/why3/META;
-chmod a-w .merlin;
 chmod a-w src/jessie/Makefile;
-chmod a-w src/jessie/.merlin;
 chmod a-w lib/coq/version lib/pvs/version;
 chmod u+x src/config.sh)
 

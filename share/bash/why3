@@ -128,4 +128,4 @@ _why3()
 
     _filedir
 
-} && complete -F _why3 why3 why3.opt why3.byte
+} && complete -F _why3 why3 why3.exe

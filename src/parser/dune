@@ -1,0 +1,37 @@
+(ocamllex lexer)
+(menhir (modules parser_common parser)
+ (merge_into parser)
+ (infer false)
+ (flags --table --explain --strict)
+  ;table is needed otherwise we have a segfault
+)
+
+(library
+     (name why3_parser)
+     (public_name why3.parser)
+     (flags -open Why3_util -open Why3_core -open Why3_mlw -w A-4-9-41-44-45-50-52@5@8@48)
+     (libraries why3.util why3.core why3.mlw num menhirLib)
+)
+
+(rule
+  (with-stdout-to handcrafted.messages.new
+           (run %{bin:menhir} --explain --strict %{dep:parser_common.mly} %{dep:parser.mly} --base %{dep:parser.mly} --update-errors %{dep:handcrafted.messages})))
+
+(rule
+ (with-stdout-to handcrafted.messages.updated
+  (run %{dep:tidy_menhir/tidy_menhir.exe} %{dep:handcrafted.messages.new})
+))
+
+(rule
+ (target parser_messages.ml)
+ (action
+  (progn
+   (diff handcrafted.messages handcrafted.messages.updated)
+   (with-stdout-to parser_messages.ml
+    (run
+      %{bin:menhir} --explain --strict %{dep:parser_common.mly} %{dep:parser.mly} --base %{dep:parser.mly} --compile-errors
+      %{dep:handcrafted.messages.updated}
+   ))
+  )
+ )
+)

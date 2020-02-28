@@ -3,7 +3,7 @@ OVERLAY ?= no
 LOCAL ?= $(BENCH)
 
 ifeq ($(LOCAL),yes)
-  WHY3=../../bin/why3.opt
+  WHY3=../../bin/why3
 else
   ifeq ($(BINDIR),)
     WHY3=why3

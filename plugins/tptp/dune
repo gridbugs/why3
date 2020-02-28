@@ -1,0 +1,8 @@
+(ocamllex tptp_lexer)
+(menhir (modules tptp_parser)(infer false))
+
+(library
+ (public_name why3.plugin.tptp)
+ (name why3_plugin_tptp)
+ (libraries why3)
+)

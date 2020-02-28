@@ -1,0 +1,21 @@
+(executable
+       (public_name why3ide)
+       (modules gtkcompat gconfig ide_utils why3ide)
+       (libraries why3
+                (select gtkcompat.ml from
+                  (lablgtk3 lablgtk3-sourceview3 -> gtkcompat.3.ml )
+                  (lablgtk2 lablgtk2.sourceview2 -> gtkcompat.2.ml )
+                )
+       )
+       (flags -linkall)
+       (package why3-ide)
+)
+
+(executable
+       (name why3web)
+       (public_name why3webserver)
+       (modules wserver why3web)
+       (libraries why3)
+       (flags -linkall)
+       (package why3)
+)

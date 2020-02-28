@@ -318,28 +318,57 @@ let parse_prover_run res_parser signaled time out exitcode limit ~printer_mappin
     pr_models = models;
   }
 
+let cmd_regexp =
+  Re.compile
+    Re.(longest
+          (seq [ char '%';
+                 alt [ group (set "%ftmDS");
+                       seq [group(set "Lld"); char '/'; group (rep1 (compl [space]))]
+                     ]
+               ]))
+
+let dir_sep =
+  assert (String.length Filename.dir_sep = 1);
+  Filename.dir_sep.[0]
+
 let actualcommand command limit file =
   let stime = string_of_int limit.limit_time in
   let smem = string_of_int limit.limit_mem in
   let arglist = Cmdline.cmdline_split command in
   let use_stdin = ref true in
   let on_timelimit = ref false in
-  let cmd_regexp = Re.Str.regexp "%\\(.\\)" in
-  let replace s = match Re.Str.matched_group 1 s with
-    | "%" -> "%"
-    | "f" -> use_stdin := false; file
-    | "t" -> on_timelimit := true; stime
-    | "m" -> smem
-    (* FIXME: libdir and datadir can be changed in the configuration file
-       Should we pass them as additional arguments? Or would it be better
+  let replace g =
+    if Re.Group.test g 1 then
+      match Re.Group.get g 1 with
+      | "%" -> "%"
+      | "f" -> use_stdin := false; file
+      | "t" -> on_timelimit := true; stime
+      | "m" -> smem
+      (* FIXME: libdir and datadir can be changed in the configuration file
+         Should we pass them as additional arguments? Or would it be better
        to prepare the command line in a separate function? *)
-    | "l" -> Config.libdir
-    | "d" -> Config.datadir
-    | "S" -> string_of_int limit.limit_steps
-    | _ -> failwith "unknown specifier, use %%, %f, %t, %m, %l, %d or %S"
+      | "D" -> String.concat ":" Config.datadir
+      | "S" -> string_of_int limit.limit_steps
+      | _ -> assert false (* absurd matched by the regexp *)
+    else begin
+      assert ( Re.Group.test g 2 );
+      assert ( Re.Group.test g 3 );
+      let suffix = String.map (function
+          | '/' -> dir_sep
+          | c -> c) (Re.Group.get g 3) in
+      match Re.Group.get g 2 with
+      (* FIXME: libdir and datadir can be changed in the configuration file
+         Should we pass them as additional arguments? Or would it be better
+       to prepare the command line in a separate function? *)
+      | "l" -> Sysutil.lookup_in_dirs suffix Config.libdir
+      | "d" -> Sysutil.lookup_in_dirs suffix Config.datadir
+      | "L" -> String.concat ":"
+                 (List.map (fun p -> Sysutil.concat p suffix) Config.libdir)
+      | _ -> assert false (* absurd matched by the regexp *)
+    end
   in
   let args =
-    List.map (Re.Str.global_substitute cmd_regexp replace) arglist
+    List.map (Re.replace cmd_regexp ~f:replace) arglist
   in
   args, !use_stdin, !on_timelimit
 

@@ -1,0 +1,11 @@
+(library
+     (name why3_printer)
+     (public_name why3.printer)
+     (modules
+     cntexmp_printer alt_ergo why3printer smtv1 smtv2 coq
+     pvs isabelle
+     simplify gappa cvc3 yices mathematica
+     )
+     (flags -open Why3_util -open Why3_core -open Why3_transform -open Why3_mlw -w A-4-9-41-44-45-50-52@5@8@48)
+     (libraries why3.util why3.core why3.transform why3.mlw num)
+)

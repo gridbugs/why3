@@ -1,0 +1,15 @@
+(ocamllex py_lexer)
+(menhir (modules py_parser) (infer false))
+
+(library
+ (public_name why3.plugin.python)
+ (name why3_plugin_python)
+ (libraries why3)
+)
+
+(plugin
+ (name why3-plugin-python)
+ (libraries why3.plugin.python)
+ (site (why3 plugins))
+ (package why3)
+)

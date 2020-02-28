@@ -121,7 +121,7 @@ let defined_ty ~loc denv env impl dw tyl =
 
 let defined_arith ~loc denv env impl dw tl =
   let ts = match tl with
-    | { t_ty = Some {ty_node = Tyapp (ts,[]) }}::_ -> ts
+    | { t_ty = Some {ty_node = Tyapp (ts,[]); _ }; _}::_ -> ts
     | _::_ -> error ~loc NonNumeric
     | [] -> error ~loc BadArity in
   let get_theory s = Env.read_theory denv.de_env ["tptp"] s in
@@ -465,7 +465,7 @@ and let_defn denv env impl { e_node = n ; e_loc = loc } =
   in
   let rec check ss vl al = match vl,al with
     | [],[] -> ()
-    | (v,_)::vl, { e_node = Evar u }::al when u = v ->
+    | (v,_)::vl, { e_node = Evar u; _ }::al when u = v ->
         let ss = Sstr.change (fun b ->
           not (b && error ~loc (DuplicateVar v))) v ss in
         check ss vl al

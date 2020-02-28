@@ -1,0 +1,12 @@
+(install
+ (package why3)
+ (section (site (why3 datadir)))
+ (files
+	provers-detection-data.conf
+	why3session.dtd
+	(vim/ftdetect/why3.vim as vim/ftdetect/why3.vim)
+	(vim/syntax/why3.vim as vim/syntax/why3.vim)
+	(lang/why3.lang as lang/why3.lang)
+	(lang/why3c.lang as lang/why3c.lang)
+	(lang/why3py.lang as lang/why3py.lang)
+))

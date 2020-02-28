@@ -1,0 +1,14 @@
+(library
+ (public_name why3.plugin.hypothesis-selection)
+ (name why3_plugin_hypothesis_selection)
+ (libraries why3 ocamlgraph)
+ (flags -w A-4-9-41-44-45-50-52@5@8@48)
+)
+
+
+(plugin
+ (name why3-plugin-hypothesis-selection)
+ (libraries why3.plugin.hypothesis-selection)
+ (site (why3 plugins))
+ (package why3)
+)

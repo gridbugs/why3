@@ -37,7 +37,7 @@ let print_tvar fmt {tv_name = id} =
   let san = Strings.capitalize in
   fprintf fmt "%s" (id_unique ~sanitizer:san ident_printer id)
 
-let print_var fmt {vs_name = id} =
+let print_var fmt {vs_name = id; _} =
   let san = Strings.capitalize in
   fprintf fmt "%s" (id_unique ~sanitizer:san ident_printer id)
 
@@ -207,8 +207,8 @@ let print_fmla info fmt f =
 
 let print_decl info fmt d = match d.d_node with
   | Dtype _ when info.info_fmt = FOF -> ()
-  | Dtype { ts_def = Alias _ } -> ()
-  | Dtype { ts_args = _::_ } when info.info_fmt = TFF0 -> ()
+  | Dtype { ts_def = Alias _; _ } -> ()
+  | Dtype { ts_args = _::_; _ } when info.info_fmt = TFF0 -> ()
   | Dtype ts when query_syntax info.info_syn ts.ts_name <> None -> ()
   | Dtype ts ->
       let print_arg fmt _ = fprintf fmt "$tType" in

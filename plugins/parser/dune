@@ -1,0 +1,15 @@
+(ocamllex dimacs)
+
+(library
+  (public_name why3.plugin.parser)
+  (name why3_plugin_parser)
+  (libraries why3)
+)
+
+
+(plugin
+ (name why3-plugin-parse)
+ (libraries why3.plugin.parser)
+ (site (why3 plugins))
+ (package why3)
+)
