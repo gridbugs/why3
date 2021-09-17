@@ -1,83 +1,13 @@
 File "bench/check-ce/func_call5.mlw", line 8, characters 12-24:
-Goal Postcondition from verification condition g1'vc.
-Prover result is: valid (0.02s, 26 steps).
+Sub-goal Postcondition of goal g1'vc.
+Prover result is: Valid (0.02s, 56 steps).
 
-File "bench/check-ce/func_call5.mlw", line 13, characters 10-14:
-Goal Precondition from verification condition f1'vc.
-Prover result is: valid (0.02s, 83 steps).
+File "bench/check-ce/func_call5.mlw", line 14, characters 10-14:
+Sub-goal Precondition of goal f1'vc.
+Prover result is: Valid (0.02s, 86 steps).
 
-<check-ce>Check model 0 ("bench/check-ce/func_call5.mlw", line 14, characters 11-17)
-<check-ce>Validating model:
-          File func_call5.mlw:
-            Line 8:
-              x = {"type": "Integer", "val": "1"}
-              z =
-                {"type": "Record",
-                 "val":
-                  {"Field":
-                    [{"field": "contents",
-                      "value": {"type": "Integer", "val": "0"}}]}}
-            Line 11:
-              x = {"type": "Integer", "val": "1"}
-            Line 13:
-              z =
-                {"type": "Record",
-                 "val":
-                  {"Field":
-                    [{"field": "contents",
-                      "value": {"type": "Integer", "val": "0"}}]}}
-            Line 14:
-              the check fails with all inputs
-<check-ce>Interpreting concretly
-<check-ce>Interpreting abstractly
-<rac-values>No value for result at "bench/check-ce/func_call5.mlw", line 13, characters 10-14, taking default.
-<check-ce>Result of checking model 0:
-            - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
-              File int.mlw:
-                Line 13:
-                  Constant zero initialization
-                Line 14:
-                  Constant one initialization
-              File func_call5.mlw:
-                Line 11:
-                  x = 1
-                  Execution of main function f1's body with env:
-                    x = 1
-                    zero = 0
-                    one = 1
-                Line 13:
-                  Concrete execution of g1 with args:
-                    y = 1
-                Line 9:
-                  Concrete execution of ref with args:
-                    contents = 1
-                  Concrete execution of ref'mk with args:
-                    contents = 1
-                Line 11:
-                  Execution of main function terminated normally
-            - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/func_call5.mlw", line 8, characters 12-24)
-              File int.mlw:
-                Line 13:
-                  Constant zero initialization
-                Line 14:
-                  Constant one initialization
-              File func_call5.mlw:
-                Line 11:
-                  x = 1
-                  Execution of main function f1's body with env:
-                    x = 1
-                    zero = 0
-                    one = 1
-                Line 13:
-                  Abstract execution of g1 with args:
-                    y = 1
-                  result = (ref'mk 0)
-                Line 8:
-                  Execution got stuck, Assume postcondition of g1 with:
-                    y = 1
-                    result = (ref'mk 0)
-<check-ce>Check model 1 ("bench/check-ce/func_call5.mlw", line 14, characters 11-17)
-<check-ce>Validating model:
+<check-ce>Check model 0 ("bench/check-ce/func_call5.mlw", line 15, characters 11-17)
+<check-ce>Checking model:
           File func_call5.mlw:
             Line 8:
               x = {"type": "Integer", "val": "1"}
@@ -89,14 +19,14 @@ Prover result is: valid (0.02s, 83 steps).
                       "value": {"type": "Integer", "val": "2"}}]}}
             Line 11:
               x = {"type": "Integer", "val": "1"}
-            Line 13:
+            Line 14:
               z =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "2"}}]}}
-            Line 14:
+            Line 15:
               x = {"type": "Integer", "val": "1"}
               z =
                 {"type": "Record",
@@ -104,299 +34,175 @@ Prover result is: valid (0.02s, 83 steps).
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "2"}}]}}
-<check-ce>Interpreting concretly
-<check-ce>Interpreting abstractly
-<rac-values>No value for result at "bench/check-ce/func_call5.mlw", line 13, characters 10-14, taking default.
-<check-ce>Result of checking model 1:
-            - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
+<check-ce>Giant-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter `x` at "bench/check-ce/func_call5.mlw", line 11, characters 8-9: 1
+<rac-values>No value for return value of call to g1 at "bench/check-ce/func_call5.mlw", line 14, characters 10-14 at "bench/check-ce/func_call5.mlw", line 14, characters 10-14
+<check-ce>Normal RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter `x` at "bench/check-ce/func_call5.mlw", line 11, characters 8-9: 1
+<check-ce>Result of checking model 0: INCOMPLETE
+            - Concrete RAC: NORMAL
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
               File func_call5.mlw:
                 Line 11:
                   x = 1
-                  Execution of main function f1's body with env:
+                  x = 1
+                  Execution of main function `f1` with env:
                     x = 1
                     zero = 0
                     one = 1
-                Line 13:
-                  Concrete execution of g1 with args:
+                Line 14:
+                  Normal execution of function `g1` with args:
                     y = 1
                 Line 9:
-                  Concrete execution of ref with args:
+                  Normal execution of function `ref` with args:
                     contents = 1
-                  Concrete execution of ref'mk with args:
+                  Normal execution of function `ref'mk` with args:
                     contents = 1
                 Line 11:
                   Execution of main function terminated normally
-            - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/func_call5.mlw", line 8, characters 12-24)
-              File int.mlw:
-                Line 13:
-                  Constant zero initialization
-                Line 14:
-                  Constant one initialization
-              File func_call5.mlw:
-                Line 11:
-                  x = 1
-                  Execution of main function f1's body with env:
-                    x = 1
-                    zero = 0
-                    one = 1
-                Line 13:
-                  Abstract execution of g1 with args:
-                    y = 1
-                  result = (ref'mk 0)
-                Line 8:
-                  Execution got stuck, Assume postcondition of g1 with:
-                    y = 1
-                    result = (ref'mk 0)
-<check-ce>Check model 2 ("bench/check-ce/func_call5.mlw", line 14, characters 11-17)
-<check-ce>Validating model:
-          File func_call5.mlw:
-            Line 8:
-              x = {"type": "Integer", "val": "1"}
-              z =
-                {"type": "Record",
-                 "val":
-                  {"Field":
-                    [{"field": "contents",
-                      "value": {"type": "Integer", "val": "2"}}]}}
-            Line 11:
-              x = {"type": "Integer", "val": "1"}
-            Line 13:
-              z =
-                {"type": "Record",
-                 "val":
-                  {"Field":
-                    [{"field": "contents",
-                      "value": {"type": "Integer", "val": "2"}}]}}
-            Line 14:
-              x = {"type": "Integer", "val": "1"}
-              z =
-                {"type": "Record",
-                 "val":
-                  {"Field":
-                    [{"field": "contents",
-                      "value": {"type": "Integer", "val": "2"}}]}}
-<check-ce>Interpreting concretly
-<check-ce>Interpreting abstractly
-<rac-values>No value for result at "bench/check-ce/func_call5.mlw", line 13, characters 10-14, taking default.
-<check-ce>Result of checking model 2:
-            - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
-              File int.mlw:
-                Line 13:
-                  Constant zero initialization
-                Line 14:
-                  Constant one initialization
-              File func_call5.mlw:
-                Line 11:
-                  x = 1
-                  Execution of main function f1's body with env:
-                    x = 1
-                    zero = 0
-                    one = 1
-                Line 13:
-                  Concrete execution of g1 with args:
-                    y = 1
-                Line 9:
-                  Concrete execution of ref with args:
-                    contents = 1
-                  Concrete execution of ref'mk with args:
-                    contents = 1
-                Line 11:
-                  Execution of main function terminated normally
-            - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/func_call5.mlw", line 8, characters 12-24)
-              File int.mlw:
-                Line 13:
-                  Constant zero initialization
-                Line 14:
-                  Constant one initialization
-              File func_call5.mlw:
-                Line 11:
-                  x = 1
-                  Execution of main function f1's body with env:
-                    x = 1
-                    zero = 0
-                    one = 1
-                Line 13:
-                  Abstract execution of g1 with args:
-                    y = 1
-                  result = (ref'mk 0)
-                Line 8:
-                  Execution got stuck, Assume postcondition of g1 with:
-                    y = 1
-                    result = (ref'mk 0)
-<check-ce>Models:
-- Checked model 0 (Concrete: bad model, Abstract: bad model)
-    Summary: Sorry, we don't have a good counterexample for you :(
-- Checked model 1 (Concrete: bad model, Abstract: bad model)
-    Summary: Sorry, we don't have a good counterexample for you :(
-- Selected model 2 (Concrete: bad model, Abstract: bad model)
-    Summary: Sorry, we don't have a good counterexample for you :(
-File "bench/check-ce/func_call5.mlw", line 14, characters 11-17:
-Goal Assertion from verification condition f1'vc.
-Prover result is: timeout (1.00s, 7023450 steps).
-Sorry, we don't have a good counterexample for you :(
+            - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to g1 at "bench/check-ce/func_call5.mlw", line 14, characters 10-14)
+              
+<check-ce-summary>Results:
+- Selected model 0: INCOMPLETE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: INCOMPLETE (terminated because missing value for return value of call to g1 at "bench/check-ce/func_call5.mlw", line 14, characters 10-14)
+File "bench/check-ce/func_call5.mlw", line 15, characters 11-17:
+Sub-goal Assertion of goal f1'vc.
+Prover result is: Step limit exceeded (1.01s).
+The following counterexample model could not be verified
+  (abstract RAC terminated because missing value for return value of call to g1 at "bench/check-ce/func_call5.mlw", line 14, characters 10-14):
+File func_call5.mlw:
+  Line 8:
+    x = 1
+    z = 2
+  Line 11:
+    x = 1
+  Line 14:
+    z = 2
+  Line 15:
+    x = 1
+    z = 2
 
-
-<check-ce>Model 0 is empty
-<check-ce>Check model 1 ("bench/check-ce/func_call5.mlw", line 20, characters 11-17)
-<check-ce>Validating model:
+<check-ce>Check model 0 ("bench/check-ce/func_call5.mlw", line 21, characters 11-17)
+<check-ce>Checking model:
           File func_call5.mlw:
-            Line 18:
-              x = {"type": "Integer", "val": "2"}
-            Line 20:
-              x = {"type": "Integer", "val": "2"}
-<check-ce>Interpreting concretly
-<check-ce>Interpreting abstractly
-<rac-values>No value for result at "bench/check-ce/func_call5.mlw", line 19, characters 10-14, taking default.
-<check-ce>Result of checking model 1:
-            - Concrete: good model (Concrete RAC confirms the counter-example)
+            Line 19:
+              x = {"type": "Integer", "val": "0"}
+            Line 21:
+              x = {"type": "Integer", "val": "0"}
+<check-ce>Giant-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter `x` at "bench/check-ce/func_call5.mlw", line 19, characters 8-9: 0
+<rac-values>Value computed from postcondition for return value of call to g2 at "bench/check-ce/func_call5.mlw", line 20, characters 10-14 at "bench/check-ce/func_call5.mlw", line 20, characters 10-14: {contents=
+                                                                    1}
+<check-ce>Normal RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Value from model for parameter `x` at "bench/check-ce/func_call5.mlw", line 19, characters 8-9: 0
+<check-ce>Result of checking model 0: NC
+            - Concrete RAC: FAILURE (assertion at "bench/check-ce/func_call5.mlw", line 21, characters 11-17)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
               File func_call5.mlw:
-                Line 18:
-                  x = 2
-                  Execution of main function f2's body with env:
-                    x = 2
-                    zero = 0
-                    one = 1
                 Line 19:
-                  Concrete execution of g2 with args:
-                    y = 2
-                Line 16:
-                  Concrete execution of (+) with args:
-                    _ = 2
-                    _ = 1
-                  Concrete execution of ref with args:
-                    contents = 3
-                  Concrete execution of ref'mk with args:
-                    contents = 3
+                  x = 0
+                  x = 0
+                  Execution of main function `f2` with env:
+                    x = 0
+                    zero = 0
+                    one = 1
                 Line 20:
-                  Property failure, Assertion with:
-                    x = 2
-                    z = (ref'mk 3)
-            - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/func_call5.mlw", line 16, characters 18-29)
-              File int.mlw:
-                Line 13:
-                  Constant zero initialization
-                Line 14:
-                  Constant one initialization
-              File func_call5.mlw:
-                Line 18:
-                  x = 2
-                  Execution of main function f2's body with env:
-                    x = 2
-                    zero = 0
-                    one = 1
-                Line 19:
-                  Abstract execution of g2 with args:
-                    y = 2
-                  result = (ref'mk 0)
-                Line 16:
-                  Execution got stuck, Assume postcondition of g2 with:
-                    y = 2
-                    result = (ref'mk 0)
-<check-ce>Check model 2 ("bench/check-ce/func_call5.mlw", line 20, characters 11-17)
-<check-ce>Validating model:
-          File func_call5.mlw:
-            Line 18:
-              x = {"type": "Integer", "val": "2"}
-            Line 20:
-              x = {"type": "Integer", "val": "2"}
-<check-ce>Interpreting concretly
-<check-ce>Interpreting abstractly
-<rac-values>No value for result at "bench/check-ce/func_call5.mlw", line 19, characters 10-14, taking default.
-<check-ce>Result of checking model 2:
-            - Concrete: good model (Concrete RAC confirms the counter-example)
-              File int.mlw:
-                Line 13:
-                  Constant zero initialization
-                Line 14:
-                  Constant one initialization
-              File func_call5.mlw:
-                Line 18:
-                  x = 2
-                  Execution of main function f2's body with env:
-                    x = 2
-                    zero = 0
-                    one = 1
-                Line 19:
-                  Concrete execution of g2 with args:
-                    y = 2
-                Line 16:
-                  Concrete execution of (+) with args:
-                    _ = 2
+                  Normal execution of function `g2` with args:
+                    y = 0
+                Line 17:
+                  Normal execution of function `(+)` with args:
+                    _ = 0
                     _ = 1
-                  Concrete execution of ref with args:
-                    contents = 3
-                  Concrete execution of ref'mk with args:
-                    contents = 3
-                Line 20:
-                  Property failure, Assertion with:
-                    x = 2
-                    z = (ref'mk 3)
-            - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/func_call5.mlw", line 16, characters 18-29)
+                  Normal execution of function `ref` with args:
+                    contents = 1
+                  Normal execution of function `ref'mk` with args:
+                    contents = 1
+                Line 21:
+                  Property failure at assertion with:
+                    x = 0
+                    z = {contents= 1}
+            - Abstract RAC: FAILURE (assertion at "bench/check-ce/func_call5.mlw", line 21, characters 11-17)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
               File func_call5.mlw:
-                Line 18:
-                  x = 2
-                  Execution of main function f2's body with env:
-                    x = 2
+                Line 19:
+                  x = 0
+                  x = 0
+                  Execution of main function `f2` with env:
+                    x = 0
                     zero = 0
                     one = 1
-                Line 19:
-                  Abstract execution of g2 with args:
-                    y = 2
-                  result = (ref'mk 0)
-                Line 16:
-                  Execution got stuck, Assume postcondition of g2 with:
-                    y = 2
-                    result = (ref'mk 0)
-<check-ce>Models:
-- Selected model 1 (Concrete: good model, Abstract: bad model)
-    Summary: The program does not comply to the verification goal
-- Checked model 2 (Concrete: good model, Abstract: bad model)
-    Summary: The program does not comply to the verification goal
-File "bench/check-ce/func_call5.mlw", line 20, characters 11-17:
-Goal Assertion from verification condition f2'vc.
-Prover result is: timeout (1.00s, 7864093 steps).
+                Line 20:
+                  Giant-step execution of function `g2` with args:
+                    y = 0
+                  result of `g2` = {contents= 1}
+                Line 21:
+                  Property failure at assertion with:
+                    x = 0
+                    z = {contents= 1}
+<check-ce-summary>Results:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (assertion at "bench/check-ce/func_call5.mlw", line 21, characters 11-17)
+  - Abstract RAC: FAILURE (assertion at "bench/check-ce/func_call5.mlw", line 21, characters 11-17)
+File "bench/check-ce/func_call5.mlw", line 21, characters 11-17:
+Sub-goal Assertion of goal f2'vc.
+Prover result is: Step limit exceeded (0.85s).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
   Line 13:
     Constant zero initialization
+    zero = 0
   Line 14:
     Constant one initialization
+    one = 1
 File func_call5.mlw:
-  Line 18:
-    x = 2
-    Execution of main function f2's body with env:
-      x = 2
+  Line 19:
+    x = 0
+    x = 0
+    Execution of main function `f2` with env:
+      x = 0
       zero = 0
       one = 1
-  Line 19:
-    Concrete execution of g2 with args:
-      y = 2
-  Line 16:
-    Concrete execution of (+) with args:
-      _ = 2
-      _ = 1
-    Concrete execution of ref with args:
-      contents = 3
-    Concrete execution of ref'mk with args:
-      contents = 3
   Line 20:
-    Property failure, Assertion with:
-      x = 2
-      z = (ref'mk 3)
+    Normal execution of function `g2` with args:
+      y = 0
+  Line 17:
+    Normal execution of function `(+)` with args:
+      _ = 0
+      _ = 1
+    Normal execution of function `ref` with args:
+      contents = 1
+    Normal execution of function `ref'mk` with args:
+      contents = 1
+  Line 21:
+    Property failure at assertion with:
+      x = 0
+      z = {contents= 1}
 

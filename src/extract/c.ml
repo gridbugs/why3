@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -560,7 +560,7 @@ module Print = struct
 
   let clear_local_printer () = Ident.forget_all (Opt.get !local_printer)
 
-  let space_nolinebreak fmt () = fprintf fmt " "
+  let space_nolinebreak fmt () = pp_print_string fmt " "
 
   let protect_on ?(boxed=false) x s =
     if x then "@[<1>(" ^^ s ^^ ")@]"
@@ -579,7 +579,7 @@ module Print = struct
     | _ -> Constant.default_escape c
 
   let rec print_ty ?(paren=false) fmt = function
-    | Tvoid -> fprintf fmt "void"
+    | Tvoid -> pp_print_string fmt "void"
     | Tsyntax (s, tl) ->
       syntax_arguments s (print_ty ~paren:false) fmt tl
     | Tptr ty -> fprintf fmt "%a *" (print_ty ~paren:true) ty
@@ -598,26 +598,26 @@ module Print = struct
     | Tnosyntax -> raise (Unprinted "type without syntax")
 
   and print_unop fmt = function
-    | Unot -> fprintf fmt "!"
-    | Ustar -> fprintf fmt "*"
-    | Uaddr -> fprintf fmt "&"
-    | Upreincr | Upostincr -> fprintf fmt "++"
-    | Upredecr | Upostdecr -> fprintf fmt "--"
+    | Unot -> pp_print_string fmt "!"
+    | Ustar -> pp_print_string fmt "*"
+    | Uaddr -> pp_print_string fmt "&"
+    | Upreincr | Upostincr -> pp_print_string fmt "++"
+    | Upredecr | Upostdecr -> pp_print_string fmt "--"
 
   and unop_postfix = function
     | Upostincr | Upostdecr -> true
     | _ -> false
 
   and print_binop fmt = function
-    | Band -> fprintf fmt "&&"
-    | Bor -> fprintf fmt "||"
-    | Beq -> fprintf fmt "=="
-    | Bne -> fprintf fmt "!="
-    | Bassign -> fprintf fmt "="
-    | Blt -> fprintf fmt "<"
-    | Ble -> fprintf fmt "<="
-    | Bgt -> fprintf fmt ">"
-    | Bge -> fprintf fmt ">="
+    | Band -> pp_print_string fmt "&&"
+    | Bor -> pp_print_string fmt "||"
+    | Beq -> pp_print_string fmt "=="
+    | Bne -> pp_print_string fmt "!="
+    | Bassign -> pp_print_string fmt "="
+    | Blt -> pp_print_string fmt "<"
+    | Ble -> pp_print_string fmt "<="
+    | Bgt -> pp_print_string fmt ">"
+    | Bge -> pp_print_string fmt ">="
 
   and print_expr ~prec fmt = function
     (* invariant: 0 <= prec <= 15 *)
@@ -750,15 +750,14 @@ module Print = struct
          print_expr_no_paren etest
          print_expr_no_paren eincr
          (print_stmt ~braces:false) s
-    | Sbreak -> fprintf fmt "break;"
-    | Sreturn Enothing -> fprintf fmt "return;"
+    | Sbreak -> pp_print_string fmt "break;"
+    | Sreturn Enothing -> pp_print_string fmt "return;"
     | Sreturn e -> fprintf fmt "return %a;" print_expr_no_paren e
 
   and print_def ~global fmt def =
     let print_inline fmt id =
       if Sattr.mem c_static_inline id.id_attrs
-      then fprintf fmt "static inline "
-      else fprintf fmt "" in
+      then pp_print_string fmt "static inline " in
     match def with
       | Dfun (id,(rt,args),body) ->
           fprintf fmt "@[@\n@[<hv 2>%a%a %a(@[%a@]) {@\n@[%a@]@]\n}@]"
@@ -1371,6 +1370,7 @@ module MLToC = struct
     | Ematch (_e1, [Pvar _v, _e2], []) ->
        assert false (* simplified at Compile *)
     | Ematch (({e_node = Eapp(rs,_, _)} as e1), [Ptuple rets,e2], [])
+    | Ematch ({e_node = Eblock [{e_node = Eapp(rs, _, _)} as e1]}, [Ptuple rets, e2], [])
          when List.for_all
                 (function | Pwild (*ghost*) | Pvar _ -> true |_-> false)
                 rets
@@ -1675,7 +1675,7 @@ module MLToC = struct
        if Debug.test_noflag debug_c_no_error_msgs
        then
          Format.eprintf
-           "Could not translate declaration of %s. Unsupported : %s@."
+           "Could not translate declaration of %s. Unsupported: %s@."
            !current_decl_name s;
        []
 

@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -25,7 +25,7 @@ type model_float =
   | Plus_infinity | Minus_infinity | Plus_zero | Minus_zero | Not_a_number
   | Float_number of {hex: string option (* e.g., 0x1.ffp99 *); binary: model_float_binary}
 
-type model_value =
+type model_const =
   | Boolean of bool
   | String of string
   | Integer of model_int
@@ -33,10 +33,15 @@ type model_value =
   | Bitvector of model_bv
   | Decimal of model_dec
   | Fraction of model_frac
+
+type model_value =
+  | Const of model_const
   | Array of model_array
   | Record of model_record
   | Proj of model_proj
   | Apply of string * model_value list
+  | Var of string
+  | Undefined
   | Unparsed of string
 
 and arr_index = {arr_index_key: model_value; arr_index_value: model_value}
@@ -72,7 +77,12 @@ val array_add_element :
 val float_of_binary : model_float_binary -> model_float
 
 val print_model_value : Format.formatter -> model_value -> unit
+val print_model_value_human : Format.formatter -> model_value -> unit
 
+val print_model_const_human : Format.formatter -> model_const -> unit
+
+val debug_force_binary_floats : Debug.flag
+(** Print all floats using bitvectors in JSON output for models *)
 
 (*
 ***************************************************************
@@ -81,15 +91,27 @@ val print_model_value : Format.formatter -> model_value -> unit
 *)
 
 type model_element_kind =
-| Result (* Result of a function call (if the counter-example is for postcondition)  *)
-| Old (* Old value of function argument (if the counter-example is for postcondition) *)
-| At of string (* Value at label *)
-| Error_message (* The model element represents error message, not source-code element.
-                   The error message is saved in the name of the model element.*)
-| Loop_before
-| Loop_previous_iteration
-| Loop_current_iteration
-| Other
+  | Result
+  (** Result of a function call (if the counter-example is for postcondition) *)
+  | Call_result of Loc.position
+  (** Result of the function call at the given location *)
+  | Old
+  (** Old value of function argument (if the counter-example is for
+      postcondition) *)
+  | At of string
+  (** Value at label *)
+  | Loop_before
+  (** Value from before the loop *)
+  | Loop_previous_iteration
+  (** Value from before current loop iteration *)
+  | Loop_current_iteration
+  (** Value from current loop iteration *)
+  | Error_message
+  (** The model element represents error message, not source-code element. The
+     error message is saved in the name of the model element.*)
+  | Other
+
+val print_model_kind : Format.formatter -> model_element_kind -> unit
 
 (** Information about the name of the model element *)
 type model_element_name = {
@@ -145,11 +167,21 @@ val get_model_elements : model -> model_element list
 val get_model_term_loc : model -> Loc.position option
 val get_model_term_attrs : model -> Ident.Sattr.t
 
-val get_model_element : model -> string -> Loc.position -> model_element option
-val get_model_element_by_id : model -> Ident.ident -> model_element option
-val get_model_element_by_loc : model -> Loc.position -> model_element option
+(** {2 Search model elements} *)
+
+val search_model_element_for_id :
+  model -> ?loc:Loc.position -> Ident.ident -> model_element option
+(** [search_model_element_for_id m ?loc id] searches for a model element for
+    identifier [id], at the location [id.id_loc], or at [loc], when given. *)
+
+val search_model_element_call_result :
+  model -> Loc.position -> model_element option
+(** [search_model_element_call_result m loc] searches for a model element that
+    holds the return value for a call at location [loc]. *)
 
 (** {2 Printing the model} *)
+
+val json_model : model -> Json_base.json
 
 val print_model :
   ?filter_similar:bool ->
@@ -177,25 +209,8 @@ val print_model_human :
   unit
 (** Same as print_model but is intended to be human readable.*)
 
-val print_model_json :
-  ?me_name_trans:(model_element_name -> string) ->
-  ?vc_line_trans:(int -> string) ->
-  Format.formatter ->
-  model ->
-  unit
+val print_model_json : Format.formatter -> model -> unit
 (** Prints counter-example model to json format.
-
-    @param me_name_trans see print_model
-    @param vc_line_trans the transformation from the line number corresponding
-      to the term that triggers VC before splitting VC to the name of JSON field
-      storing counterexample information related to this term. By default, this
-      information is stored in JSON field corresponding to this line, i.e.,
-      the transformation is [string_of_int].
-      Note that the exact line of the construct that triggers VC may not be
-      known. This can happen if the term that triggers VC spans multiple lines
-      and it is splitted.
-      This transformation can be used to store the counterexample information
-      related to this term in dedicated JSON field
 
     The format is the following:
     - counterexample is JSON object with fields indexed by names of files
@@ -292,13 +307,13 @@ val model_for_positions_and_decls : model ->
 ***************************************************************
 *)
 
-(** Method clean#model cleans a model from unparsed values (except for elements of kind
-   error messag). The cleaning can be extended by method overriding. *)
+(** Method clean#model cleans a model from unparsed values and handles
+   contradictory VCs ("the check fails with all inputs"). *)
 class clean : object
   method model : model -> model
   method element : model_element -> model_element option
   method value : model_value -> model_value option
-  method unparsed : string -> model_value option
+  method const : model_const -> model_value option
   method integer : model_int -> model_value option
   method string : string -> model_value option
   method decimal : model_dec -> model_value option
@@ -306,11 +321,17 @@ class clean : object
   method float : model_float -> model_value option
   method boolean : bool -> model_value option
   method bitvector : model_bv -> model_value option
+  method var : string -> model_value option
   method proj : string -> model_value -> model_value option
   method apply : string -> model_value list -> model_value option
   method array : model_array -> model_value option
   method record : model_record -> model_value option
+  method undefined : model_value option
+  method unparsed : string -> model_value option
 end
+
+val customize_clean : #clean -> unit
+(** Customize the class used to clean the values in the model. *)
 
 (*
 ***************************************************************
@@ -319,9 +340,9 @@ end
 *)
 
 type model_parser = Printer.printer_mapping -> string -> model
-(** Parses the input string into model elements, estabilishes
-    a mapping between these elements and mapping from printer
-    and builds model data structure.*)
+(** Parses the input string into model elements, estabilishes a mapping between these
+   elements and mapping from printer and builds model data structure. The model still has
+   to be cleaned using [clean]. *)
 
 type raw_model_parser = Printer.printer_mapping -> string -> model_element list
 

@@ -5,8 +5,17 @@
 <prover id="0" name="Z3" version="4.5.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Z3" version="3.2" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="3" name="Alt-Ergo" version="2.3.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="bag.mlw"/>
+<theory name="Bag" proved="true">
+ <goal name="add&#39;vc" expl="VC for add" proved="true">
+ <proof prover="3"><result status="valid" time="0.00" steps="0"/></proof>
+ </goal>
+ <goal name="remove&#39;vc" expl="VC for remove" proved="true">
+ <proof prover="3"><result status="valid" time="0.00" steps="0"/></proof>
+ </goal>
+</theory>
 <theory name="BagSpec" proved="true">
  <goal name="t&#39;vc" expl="VC for t" proved="true">
  <proof prover="1"><result status="valid" time="0.00" steps="1"/></proof>
@@ -19,13 +28,13 @@
 </theory>
 <theory name="BagImpl" proved="true">
  <goal name="t&#39;vc" expl="VC for t" proved="true">
- <proof prover="1"><result status="valid" time="0.00" steps="12"/></proof>
+ <proof prover="1"><result status="valid" time="0.00" steps="10"/></proof>
  </goal>
  <goal name="create&#39;vc" expl="VC for create" proved="true">
  <proof prover="1"><result status="valid" time="0.01" steps="21"/></proof>
  </goal>
  <goal name="clear&#39;vc" expl="VC for clear" proved="true">
- <proof prover="1"><result status="valid" time="0.01" steps="48"/></proof>
+ <proof prover="1"><result status="valid" time="0.01" steps="49"/></proof>
  </goal>
  <goal name="add&#39;vc" expl="VC for add" proved="true">
  <transf name="split_goal_right" proved="true" >
@@ -148,13 +157,13 @@
  <goal name="BagSpec.t&#39;vc" expl="VC for t" proved="true">
  <proof prover="1"><result status="valid" time="0.00" steps="2"/></proof>
  </goal>
- <goal name="BagSpec.create&#39;vc" expl="VC for create" proved="true">
+ <goal name="BagSpec.create&#39;refn&#39;vc" expl="VC for create&#39;refn" proved="true">
  <proof prover="1"><result status="valid" time="0.01" steps="12"/></proof>
  </goal>
- <goal name="BagSpec.clear&#39;vc" expl="VC for clear" proved="true">
+ <goal name="BagSpec.clear&#39;refn&#39;vc" expl="VC for clear&#39;refn" proved="true">
  <proof prover="1"><result status="valid" time="0.01" steps="15"/></proof>
  </goal>
- <goal name="BagSpec.add&#39;vc" expl="VC for add" proved="true">
+ <goal name="BagSpec.add&#39;refn&#39;vc" expl="VC for add&#39;refn" proved="true">
  <proof prover="1"><result status="valid" time="0.01" steps="1"/></proof>
  </goal>
 </theory>

@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -411,11 +411,16 @@ let set_obsolete s paid b =
   pa.proof_obsolete <- b
  *)
 
-let check_if_already_exists s pid t args =
-    let sub_transfs = get_transformations s pid in
-    List.exists (fun tr_id ->
+let get_transformation s pid t args =
+  let sub_transfs = get_transformations s pid in
+  List.find (fun tr_id ->
       get_transf_name s tr_id = t && get_transf_args s tr_id = args &&
       not (is_detached s (ATn tr_id))) sub_transfs
+
+let check_if_already_exists s pid t args =
+  match get_transformation s pid t args with
+  | _ -> true
+  | exception Not_found -> false
 
 (* Iterations functions on the session tree *)
 
@@ -544,7 +549,7 @@ open Format
 open Ident
 
 let print_proof_attempt fmt pa =
-  fprintf fmt "%a tl=%d %a"
+  fprintf fmt "@[<h>%a tl=%d %a@]"
           Whyconf.print_prover pa.prover
           pa.limit.Call_provers.limit_time
           (Pp.print_option (Call_provers.print_prover_result ~json:false))
@@ -1285,7 +1290,22 @@ let get_version (xml: Xml.t) =
 
 module ReadShapes (C:Compress.S) = struct
 
-let shape = Buffer.create 97
+let input_line =
+  let shape = Buffer.create 97 in
+  fun ch ->
+  Buffer.clear shape;
+  try
+    while true do
+      let c = C.input_char ch in
+      if c = '\n' then raise Exit;
+      Buffer.add_char shape c
+    done;
+    assert false
+  with
+  | End_of_file ->
+     raise (ShapesFileError "shapes files corrupted (premature end of file), ignored");
+  | Exit -> Buffer.contents shape
+
 
 let read_sum_and_shape ch =
   let sum = Bytes.create 32 in
@@ -1304,38 +1324,19 @@ let read_sum_and_shape ch =
   end;
   if try C.input_char ch <> ' ' with End_of_file -> true then
     raise (ShapesFileError "shapes files corrupted (space missing), ignored");
-  Buffer.clear shape;
-  try
-    while true do
-      let c = C.input_char ch in
-      if c = '\n' then raise Exit;
-      Buffer.add_char shape c
-    done;
-    assert false
-  with
-  | End_of_file ->
-     raise (ShapesFileError "shapes files corrupted (premature end of file), ignored");
-  | Exit -> Bytes.unsafe_to_string sum, Buffer.contents shape
+  let shape = input_line ch in
+  Bytes.unsafe_to_string sum, shape
 
 (* Read the first part of the shapes: a list of shapes which are then referred
    as H1 ... Hn in the shape corresponding to tasks *)
 let rec read_global_buffer gs ch =
-  Buffer.clear shape;
-  try
-    while true do
-      let c = C.input_char ch in
-      if c = '\n' then raise Exit;
-      Buffer.add_char shape c
-    done;
-    assert false
-  with
-  | End_of_file ->
-      raise (ShapesFileError "shapes files corrupted (premature end of file), ignored");
-  | Exit ->
-      let g_shape = Buffer.contents shape in
-      Buffer.clear shape;
-      if g_shape <> "" then
-        (Termcode.Gshape.add_shape_g gs g_shape; read_global_buffer gs ch)
+  let g_shape = input_line ch in
+  if g_shape <> "" then
+    begin
+      if not (Strings.has_prefix "(*" g_shape) then
+        Termcode.Gshape.add_shape_g gs g_shape;
+      read_global_buffer gs ch
+    end
 
   let sum_shape_version = ref None
 
@@ -1400,33 +1401,26 @@ let read_xml_and_shapes gs xml_fn compressed_fn =
     raise (ShapesFileError ("cannot open shapes file for reading: " ^ msg))
 end
 
-module ReadShapesNoCompress = ReadShapes(Compress.Compress_none)
-module ReadShapesCompress = ReadShapes(Compress.Compress_z)
-
 let read_file_session_and_shapes gs dir xml_filename =
   let compressed_shape_filename =
-      Filename.concat dir compressed_shape_filename
-    in
-    if Sys.file_exists compressed_shape_filename then
-      if Compress.compression_supported then
-        ReadShapesCompress.read_xml_and_shapes gs
-          xml_filename compressed_shape_filename
-      else
-        begin
-          Warning.emit "[Warning] could not read goal shapes because \
-                        Why3 was not compiled with compress support@.";
-          Xml.from_file xml_filename, None
-        end
+    Filename.concat dir compressed_shape_filename in
+  if Sys.file_exists compressed_shape_filename then
+    if Compress.compression_supported then
+      let module RS = ReadShapes(Compress.Compress_z) in
+      RS.read_xml_and_shapes gs xml_filename compressed_shape_filename
     else
-      let shape_filename = Filename.concat dir shape_filename in
-      if Sys.file_exists shape_filename then
-        ReadShapesNoCompress.read_xml_and_shapes gs
-          xml_filename shape_filename
-      else
-        begin
-          Warning.emit "[Warning] could not find goal shapes file@.";
-          Xml.from_file xml_filename, None
-        end
+      let () =
+        Warning.emit "[Warning] could not read goal shapes because \
+                      Why3 was not compiled with compress support@." in
+      Xml.from_file xml_filename, None
+  else
+    let shape_filename = Filename.concat dir shape_filename in
+    if Sys.file_exists shape_filename then
+      let module RS = ReadShapes(Compress.Compress_none) in
+      RS.read_xml_and_shapes gs xml_filename shape_filename
+    else
+      let () = Warning.emit "[Warning] could not find goal shapes file@." in
+      Xml.from_file xml_filename, None
 
 let build_session ?sum_shape_version (s : session) xml : unit =
   match xml.Xml.name with
@@ -1593,7 +1587,7 @@ let () = Exn_printer.register
     (fun fmt e ->
       match e with
       | NoProgress ->
-          Format.fprintf fmt "The transformation made no progress.\n"
+          Format.pp_print_string fmt "The transformation made no progress.\n"
       | _ -> raise e)
 
 let apply_trans_to_goal ~allow_no_effect s env name args id =
@@ -1615,7 +1609,7 @@ let add_registered_transformation s env old_tr goal_id =
     (* check if transformation already present with the same parameters.
        this should always fail and raise Not_found *)
     let _tr = List.find (fun transID -> (get_transfNode s transID).transf_name = old_tr.transf_name &&
-                        List.fold_left2 (fun b new_arg old_arg -> new_arg = old_arg && b) true
+                        Lists.equal (=)
                                         (get_transfNode s transID).transf_args
                                         old_tr.transf_args)
         goal.proofn_transformations in
@@ -2068,7 +2062,7 @@ let save_result fmt r =
 let save_status fmt s =
   match s with
   | Some result -> save_result fmt result
-  | None -> fprintf fmt "<undone/>"
+  | None -> pp_print_string fmt "<undone/>"
 
 let save_file_path fmt p =
   List.iter
@@ -2187,6 +2181,11 @@ let save fname shfname session =
     begin
       (* In version SV6 or higher, first save the list of variables that are
          referenced in shapes. *)
+      let s =
+        Format.asprintf
+          "(* shapes version: %a *)\n"
+          Termcode.pp_sum_shape_version session.shapes.shape_version in
+      Compress.Compress_z.output_string chsh s;
       Termcode.Gshape.write_shape_to_file session.shapes.session_global_shapes chsh;
       Compress.Compress_z.output_string chsh "\n";
     end;

@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -171,9 +171,9 @@ module LatexInd (Conf: sig val prefix: string val flatten_applies : bool val com
   let rec pp_pattern fmt p =
     match p.pat_desc with
     | Pwild ->
-        fprintf fmt "\\texttt{anything}"
+        pp_print_string fmt "\\texttt{anything}"
     | Pvar id ->
-        fprintf fmt "%a" (pp_var ~arity:0) id
+        pp_var ~arity:0 fmt id
     | Papp (qid, ps) ->
         let arity = List.length ps in
         fprintf fmt "%a%a" (pp_var ~arity) (id_of_qualid qid)
@@ -208,9 +208,9 @@ module LatexInd (Conf: sig val prefix: string val flatten_applies : bool val com
   let rec pp_term fmt t =
     match t.term_desc with
     | Ttrue ->
-        fprintf fmt "\\top"
+        pp_print_string fmt "\\top"
     | Tfalse ->
-        fprintf fmt "\\bot"
+        pp_print_string fmt "\\bot"
     | Tconst n ->
         Constant.print_def fmt n
     | Tident qid ->
@@ -415,9 +415,7 @@ let set_output = function
 
 let prefix = ref "WHY"
 
-let usage_msg = sprintf
-  "Usage: %s [options] [--output=latex|mlw|sexp|dep] [--kind=inductive] [--prefix=<prefix>] <filename> [<Module>.]<type> ...\n"
-  (Filename.basename Sys.argv.(0))
+let usage_msg = "<filename> [<Module>.]<type> ..."
 
 let spec =
   let open Why3.Getopt in
@@ -438,11 +436,12 @@ let parse_mlw_file filename =
     close_in c;
   mlw_file
 
-let pident fmt i = fprintf fmt "%s" i.Ptree.id_str
+let pident fmt i =
+  pp_print_string fmt i.Ptree.id_str
 
 let rec pqualid fmt q =
   Ptree.(match q with
-  | Qident id -> fprintf fmt "%a" pident id
+  | Qident id -> pident fmt id
   | Qdot(q,id) -> fprintf fmt "%a.%a" pqualid q pident id)
 
 let deps_use fmt filename (modname:string) (q:Ptree.qualid) =
@@ -455,7 +454,7 @@ let deps_use fmt filename (modname:string) (q:Ptree.qualid) =
 let deps_decl fmt filename modname d =
   Ptree.(match d with
   | Dtype _ | Dlogic _ | Dind _ | Dprop _ | Dlet _ | Drec _ | Dexn _ | Dmeta _ -> ()
-  | Dcloneexport(q,_) | Duseexport q | Dcloneimport(_,_,q,_,_) ->
+  | Dcloneexport(_,q,_) | Duseexport q | Dcloneimport(_,_,q,_,_) ->
      deps_use fmt filename modname q
   | Duseimport(_,_, mods) ->
      List.iter (fun (q,_) -> deps_use fmt filename modname q) mods
@@ -481,7 +480,7 @@ let deps_file fmt header filename f =
   if header then fprintf fmt "}@."
 
 
-let _, _, _ =
+let _, _ =
   Whyconf.Args.initialize spec add_filename_then_path usage_msg
 
 let () =
@@ -502,7 +501,7 @@ let () =
          | Sexp, None, 0 ->
              Why3pp_sexp.why3pp_sexp stdout mlw_file
          | _, _, _ ->
-             Getopt.handle_exn Sys.argv "invalid arguments"
+             Getopt.handle_exn "invalid arguments"
         )
     | None ->
-        Getopt.handle_exn Sys.argv "missing filename"
+        Getopt.handle_exn "missing filename"

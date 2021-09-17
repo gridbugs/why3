@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -438,7 +438,7 @@ val clone_post_result :
 val result_id :
   ?loc:Loc.position -> ?attrs:Sattr.t -> ?ql:post list -> unit -> preid
 (** [result_id ?loc ?ql ()] returns a fresh pre-identifier whose name
-   is appropriately chosen with respect to the optionality given list
+   is appropriately chosen with respect to the optionally given list
    of post-conditions (["result"] by default, as hard-coded in this
    module implementation). *)
 

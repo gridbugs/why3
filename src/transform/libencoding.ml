@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -269,6 +269,10 @@ let monomorphise_goal = Trans.goal (fun pr f ->
   List.fold_left
     (fun acc ts -> create_ty_decl ts :: acc)
     [create_prop_decl Pgoal pr f] ltv)
+
+let () = Trans.register_transform "monomorphise_goal" monomorphise_goal
+  ~desc:"Introduce the type variable in the goal."
+
 
 (* close by subtype the set of types tagged by meta_kept *)
 let close_kept =

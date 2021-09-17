@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -15,6 +15,8 @@ Require Import BuiltIn.
 Require BuiltIn.
 Require int.Int.
 Require list.List.
+
+Require Import Lia.
 
 (* Why3 assumption *)
 Fixpoint length {a:Type} {a_WT:WhyType a}
@@ -54,6 +56,6 @@ unfold length. fold length.
 intros H.
 exfalso.
 generalize (Length_nonnegative t).
-omega.
+lia.
 Qed.
 

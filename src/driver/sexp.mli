@@ -1,3 +1,13 @@
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
 (** {1 S-expressions and their parser}
 
@@ -16,6 +26,9 @@
 type sexp =
   | Atom of string
   | List of sexp list
+
+val exists : (sexp -> bool) -> sexp -> bool
+(** Check if the node or any of its sub-nodes satisfies the predicate. *)
 
 exception Error
 

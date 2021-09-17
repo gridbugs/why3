@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -16,6 +16,8 @@ Require BuiltIn.
 Require HighOrd.
 Require int.Int.
 Require set.Fset.
+
+Require Import Lia.
 
 (* Why3 goal *)
 Definition sum {a:Type} {a_WT:WhyType a} :
@@ -189,10 +191,8 @@ destruct a2 as (Hx1dup, Hx1eq).
   + eapply Cardinal.NoDup_app; eauto.
     - intros. rewrite Hx1eq in H0. rewrite Hdieq. rewrite set.Set.diff'def.
       intuition.
-    - intros. rewrite Hx1eq. rewrite Hdieq in H0. rewrite set.Set.diff'def in H0.
-      intuition.
 }
-omega.
+lia.
 Qed.
 
 Lemma sum_union_disj {a:Type} {a_WT:WhyType a} :
@@ -220,8 +220,6 @@ destruct a2 as (Hx1dup, Hx1eq).
     rewrite set.Set.union'def. clear - e. intuition.
   + eapply Cardinal.NoDup_app; eauto.
     * intros. intro. apply Hx0eq in H0. apply Hx1eq in H.
-      specialize (Hdisj e). intuition.
-    * intros. intro. apply Hx1eq in H0. apply Hx0eq in H.
       specialize (Hdisj e). intuition.
 Qed.
 
@@ -255,7 +253,7 @@ assert (sum (Fset.union s1 s2) f - sum (Fset.inter s1 s2) f =
   + eapply Fset.subset_trans with s1. eapply Fset.subset_inter_1.
     eapply Fset.subset_union_1.
 }
-omega.
+lia.
 Qed.
 
 (* Why3 goal *)

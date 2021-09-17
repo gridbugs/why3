@@ -1,17 +1,23 @@
-File "bench/check-ce/func_call.mlw", line 7, characters 12-21:
-Goal Postcondition from verification condition g'vc.
-Prover result is: valid (0.02s, 2283 steps).
+File "bench/check-ce/func_call.mlw", line 8, characters 12-21:
+Sub-goal Postcondition of goal g'vc.
+Prover result is: Valid (0.00s, 159 steps).
 
-<check-ce>Check model 0 ("bench/check-ce/func_call.mlw", line 13, characters 11-16)
-<check-ce>Validating model:
+<check-ce>Check model 0 ("bench/check-ce/func_call.mlw", line 14, characters 11-16)
+<check-ce>Checking model:
           File func_call.mlw:
-            Line 7:
+            Line 8:
               z =
                 {"type": "Record",
                  "val":
                   {"Field":
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
+              z =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "2"}}]}}
             Line 12:
               z =
                 {"type": "Record",
@@ -20,344 +26,157 @@ Prover result is: valid (0.02s, 2283 steps).
                     [{"field": "contents",
                       "value": {"type": "Integer", "val": "0"}}]}}
             Line 13:
-              the check fails with all inputs
-<check-ce>Interpreting concretly
-<rac-values>No value for result at "bench/check-ce/func_call.mlw", line 3, characters 9-14, taking default.
-<rac-values>Missing value for parameter _, continue with default value ().
-<check-ce>Interpreting abstractly
-<rac-values>No value for result at "bench/check-ce/func_call.mlw", line 3, characters 9-14, taking default.
-<rac-values>Missing value for parameter _, continue with default value ().
-<rac-values>Value imported for z at "bench/check-ce/func_call.mlw", line 12, characters 2-6: (ref'mk 0)
-<rac-values>No value for result at "bench/check-ce/func_call.mlw", line 12, characters 2-6, taking default.
-<check-ce>Result of checking model 0:
-            - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
+              z =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "2"}}]}}
+            Line 14:
+              z =
+                {"type": "Record",
+                 "val":
+                  {"Field":
+                    [{"field": "contents",
+                      "value": {"type": "Integer", "val": "2"}}]}}
+<check-ce>Giant-step RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for return value of call at "bench/check-ce/func_call.mlw", line 4, characters 9-14 at "bench/check-ce/func_call.mlw", line 4, characters 9-14: 0
+<rac-values>RHS evaluated for global `z` at "bench/check-ce/func_call.mlw", line 4, characters 8-9: {contents=
+                                                                    0}
+<rac-values>Type default value for parameter `_` at NO LOC: ()
+<rac-values>Value from model for variable `z` at "bench/check-ce/func_call.mlw", line 13, characters 2-6 at "bench/check-ce/func_call.mlw", line 13, characters 2-6: {contents=
+                                                                    2}
+<rac-values>Type default value for return value of call to g at "bench/check-ce/func_call.mlw", line 13, characters 2-6 at "bench/check-ce/func_call.mlw", line 13, characters 2-6: ()
+<check-ce>Normal RAC
+<rac-values>RHS evaluated for global `zero` at "WHY3DATA/stdlib/int.mlw", line 13, characters 15-19: 0
+<rac-values>RHS evaluated for global `one` at "WHY3DATA/stdlib/int.mlw", line 14, characters 15-18: 1
+<rac-values>Type default value for return value of call at "bench/check-ce/func_call.mlw", line 4, characters 9-14 at "bench/check-ce/func_call.mlw", line 4, characters 9-14: 0
+<rac-values>RHS evaluated for global `z` at "bench/check-ce/func_call.mlw", line 4, characters 8-9: {contents=
+                                                                    0}
+<rac-values>Type default value for parameter `_` at NO LOC: ()
+<check-ce>Result of checking model 0: SW
+            - Concrete RAC: NORMAL
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
               File func_call.mlw:
-                Line 3:
+                Line 4:
                   Constant z initialization
-                  (abstract) execution of any function
+                  (giant-step) execution of unimplemented function with args:
                   result = 0
-                  Concrete execution of ref with args:
+                  Normal execution of function `ref` with args:
                     contents = 0
-                  Concrete execution of ref'mk with args:
+                  Normal execution of function `ref'mk` with args:
                     contents = 0
-                Line 10:
+                  z = {contents= 0}
+              Unknown location:
                   _ = ()
-                  Execution of main function f's body with env:
-                    z = (ref'mk 1)
+              File func_call.mlw:
+                Line 11:
+                  _ = ()
+                  Execution of main function `f` with env:
+                    z = {contents= 0}
                     _ = ()
                     zero = 0
                     one = 1
-                Line 12:
-                  Concrete execution of Tuple0 with args:
-                  Concrete execution of g with args:
+                Line 13:
+                  Normal execution of function `Tuple0` with args:
+                  Normal execution of function `g` with args:
                     _ = ()
-                Line 8:
-                  Concrete execution of contents with args:
-                    arg = (ref'mk 0)
-                  Concrete execution of (+) with args:
+                Line 9:
+                  Normal execution of function `contents` with args:
+                    arg = {contents= 0}
+                  Normal execution of function `(+)` with args:
                     _ = 0
                     _ = 1
-                Line 10:
+                Line 11:
                   Execution of main function terminated normally
-            - Abstract: bad model (Abstract RAC, with the counterexample model cannot continue after "bench/check-ce/func_call.mlw", line 7, characters 12-21)
+            - Abstract RAC: FAILURE (assertion at "bench/check-ce/func_call.mlw", line 14, characters 11-16)
               File int.mlw:
                 Line 13:
                   Constant zero initialization
+                  zero = 0
                 Line 14:
                   Constant one initialization
+                  one = 1
               File func_call.mlw:
-                Line 3:
+                Line 4:
                   Constant z initialization
-                  (abstract) execution of any function
+                  (giant-step) execution of unimplemented function with args:
                   result = 0
-                  Concrete execution of ref with args:
+                  Normal execution of function `ref` with args:
                     contents = 0
-                  Concrete execution of ref'mk with args:
+                  Normal execution of function `ref'mk` with args:
                     contents = 0
-                Line 10:
+                  z = {contents= 0}
+              Unknown location:
                   _ = ()
-                  Execution of main function f's body with env:
-                    z = (ref'mk 0)
+              File func_call.mlw:
+                Line 11:
+                  _ = ()
+                  Execution of main function `f` with env:
+                    z = {contents= 0}
                     _ = ()
                     zero = 0
                     one = 1
-                Line 12:
-                  Concrete execution of Tuple0 with args:
-                  Abstract execution of g with args:
-                    _ = ()
-                  z = (ref'mk 0)
-                  result = ()
-                Line 7:
-                  Execution got stuck, Assume postcondition of g with:
-                    z = (ref'mk 0)
-                    z = (ref'mk 0)
-<check-ce>Check model 1 ("bench/check-ce/func_call.mlw", line 13, characters 11-16)
-<check-ce>Validating model:
-          File func_call.mlw:
-            Line 7:
-              old z =
-                {"type": "Record",
-                 "val":
-                  {"Field":
-                    [{"field": "contents",
-                      "value": {"type": "Integer", "val": "0"}}]}}
-              z =
-                {"type": "Record",
-                 "val":
-                  {"Field":
-                    [{"field": "contents",
-                      "value": {"type": "Integer", "val": "2"}}]}}
-            Line 11:
-              z =
-                {"type": "Record",
-                 "val":
-                  {"Field":
-                    [{"field": "contents",
-                      "value": {"type": "Integer", "val": "0"}}]}}
-            Line 12:
-              z =
-                {"type": "Record",
-                 "val":
-                  {"Field":
-                    [{"field": "contents",
-                      "value": {"type": "Integer", "val": "2"}}]}}
-            Line 13:
-              z =
-                {"type": "Record",
-                 "val":
-                  {"Field":
-                    [{"field": "contents",
-                      "value": {"type": "Integer", "val": "2"}}]}}
-<check-ce>Interpreting concretly
-<rac-values>No value for result at "bench/check-ce/func_call.mlw", line 3, characters 9-14, taking default.
-<rac-values>Missing value for parameter _, continue with default value ().
-<check-ce>Interpreting abstractly
-<rac-values>No value for result at "bench/check-ce/func_call.mlw", line 3, characters 9-14, taking default.
-<rac-values>Missing value for parameter _, continue with default value ().
-<rac-values>Value imported for z at "bench/check-ce/func_call.mlw", line 12, characters 2-6: (ref'mk 2)
-<rac-values>No value for result at "bench/check-ce/func_call.mlw", line 12, characters 2-6, taking default.
-<check-ce>Result of checking model 1:
-            - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
-              File int.mlw:
                 Line 13:
-                  Constant zero initialization
+                  Normal execution of function `Tuple0` with args:
+                  Giant-step execution of function `g` with args:
+                    _ = ()
+                  z = {contents= 2}
+                  result of `g` = ()
                 Line 14:
-                  Constant one initialization
-              File func_call.mlw:
-                Line 3:
-                  Constant z initialization
-                  (abstract) execution of any function
-                  result = 0
-                  Concrete execution of ref with args:
-                    contents = 0
-                  Concrete execution of ref'mk with args:
-                    contents = 0
-                Line 10:
-                  _ = ()
-                  Execution of main function f's body with env:
-                    z = (ref'mk 1)
-                    _ = ()
-                    zero = 0
-                    one = 1
-                Line 12:
-                  Concrete execution of Tuple0 with args:
-                  Concrete execution of g with args:
-                    _ = ()
-                Line 8:
-                  Concrete execution of contents with args:
-                    arg = (ref'mk 0)
-                  Concrete execution of (+) with args:
-                    _ = 0
-                    _ = 1
-                Line 10:
-                  Execution of main function terminated normally
-            - Abstract: good model (Abstract RAC confirms the counter-example)
-              File int.mlw:
-                Line 13:
-                  Constant zero initialization
-                Line 14:
-                  Constant one initialization
-              File func_call.mlw:
-                Line 3:
-                  Constant z initialization
-                  (abstract) execution of any function
-                  result = 0
-                  Concrete execution of ref with args:
-                    contents = 0
-                  Concrete execution of ref'mk with args:
-                    contents = 0
-                Line 10:
-                  _ = ()
-                  Execution of main function f's body with env:
-                    z = (ref'mk 2)
-                    _ = ()
-                    zero = 0
-                    one = 1
-                Line 12:
-                  Concrete execution of Tuple0 with args:
-                  Abstract execution of g with args:
-                    _ = ()
-                  z = (ref'mk 2)
-                  result = ()
-                Line 13:
-                  Property failure, Assertion with:
-                    z = (ref'mk 2)
-<check-ce>Check model 2 ("bench/check-ce/func_call.mlw", line 13, characters 11-16)
-<check-ce>Validating model:
-          File func_call.mlw:
-            Line 7:
-              old z =
-                {"type": "Record",
-                 "val":
-                  {"Field":
-                    [{"field": "contents",
-                      "value": {"type": "Integer", "val": "0"}}]}}
-              z =
-                {"type": "Record",
-                 "val":
-                  {"Field":
-                    [{"field": "contents",
-                      "value": {"type": "Integer", "val": "2"}}]}}
-            Line 11:
-              z =
-                {"type": "Record",
-                 "val":
-                  {"Field":
-                    [{"field": "contents",
-                      "value": {"type": "Integer", "val": "0"}}]}}
-            Line 12:
-              z =
-                {"type": "Record",
-                 "val":
-                  {"Field":
-                    [{"field": "contents",
-                      "value": {"type": "Integer", "val": "2"}}]}}
-            Line 13:
-              z =
-                {"type": "Record",
-                 "val":
-                  {"Field":
-                    [{"field": "contents",
-                      "value": {"type": "Integer", "val": "2"}}]}}
-<check-ce>Interpreting concretly
-<rac-values>No value for result at "bench/check-ce/func_call.mlw", line 3, characters 9-14, taking default.
-<rac-values>Missing value for parameter _, continue with default value ().
-<check-ce>Interpreting abstractly
-<rac-values>No value for result at "bench/check-ce/func_call.mlw", line 3, characters 9-14, taking default.
-<rac-values>Missing value for parameter _, continue with default value ().
-<rac-values>Value imported for z at "bench/check-ce/func_call.mlw", line 12, characters 2-6: (ref'mk 2)
-<rac-values>No value for result at "bench/check-ce/func_call.mlw", line 12, characters 2-6, taking default.
-<check-ce>Result of checking model 2:
-            - Concrete: bad model (Concrete RAC does not confirm the counter-example, no contradiction during execution)
-              File int.mlw:
-                Line 13:
-                  Constant zero initialization
-                Line 14:
-                  Constant one initialization
-              File func_call.mlw:
-                Line 3:
-                  Constant z initialization
-                  (abstract) execution of any function
-                  result = 0
-                  Concrete execution of ref with args:
-                    contents = 0
-                  Concrete execution of ref'mk with args:
-                    contents = 0
-                Line 10:
-                  _ = ()
-                  Execution of main function f's body with env:
-                    z = (ref'mk 1)
-                    _ = ()
-                    zero = 0
-                    one = 1
-                Line 12:
-                  Concrete execution of Tuple0 with args:
-                  Concrete execution of g with args:
-                    _ = ()
-                Line 8:
-                  Concrete execution of contents with args:
-                    arg = (ref'mk 0)
-                  Concrete execution of (+) with args:
-                    _ = 0
-                    _ = 1
-                Line 10:
-                  Execution of main function terminated normally
-            - Abstract: good model (Abstract RAC confirms the counter-example)
-              File int.mlw:
-                Line 13:
-                  Constant zero initialization
-                Line 14:
-                  Constant one initialization
-              File func_call.mlw:
-                Line 3:
-                  Constant z initialization
-                  (abstract) execution of any function
-                  result = 0
-                  Concrete execution of ref with args:
-                    contents = 0
-                  Concrete execution of ref'mk with args:
-                    contents = 0
-                Line 10:
-                  _ = ()
-                  Execution of main function f's body with env:
-                    z = (ref'mk 2)
-                    _ = ()
-                    zero = 0
-                    one = 1
-                Line 12:
-                  Concrete execution of Tuple0 with args:
-                  Abstract execution of g with args:
-                    _ = ()
-                  z = (ref'mk 2)
-                  result = ()
-                Line 13:
-                  Property failure, Assertion with:
-                    z = (ref'mk 2)
-<check-ce>Models:
-- Checked model 0 (Concrete: bad model, Abstract: bad model)
-    Summary: Sorry, we don't have a good counterexample for you :(
-- Selected model 1 (Concrete: bad model, Abstract: good model)
-    Summary: The contracts of some function or loop are underspecified
-- Checked model 2 (Concrete: bad model, Abstract: good model)
-    Summary: The contracts of some function or loop are underspecified
-File "bench/check-ce/func_call.mlw", line 13, characters 11-16:
-Goal Assertion from verification condition f'vc.
-Prover result is: timeout (1.00s, 5760928 steps).
-The contracts of some function or loop are underspecified, for example during
-  the following execution:
+                  Property failure at assertion with:
+                    z = {contents= 2}
+<check-ce-summary>Results:
+- Selected model 0: SW
+  - Concrete RAC: NORMAL
+  - Abstract RAC: FAILURE (assertion at "bench/check-ce/func_call.mlw", line 14, characters 11-16)
+File "bench/check-ce/func_call.mlw", line 14, characters 11-16:
+Sub-goal Assertion of goal f'vc.
+Prover result is: Step limit exceeded (0.56s).
+The contracts of some function or loop are too weak, for example during the
+  following execution:
 File int.mlw:
   Line 13:
     Constant zero initialization
+    zero = 0
   Line 14:
     Constant one initialization
+    one = 1
 File func_call.mlw:
-  Line 3:
+  Line 4:
     Constant z initialization
-    (abstract) execution of any function
+    (giant-step) execution of unimplemented function with args:
     result = 0
-    Concrete execution of ref with args:
+    Normal execution of function `ref` with args:
       contents = 0
-    Concrete execution of ref'mk with args:
+    Normal execution of function `ref'mk` with args:
       contents = 0
-  Line 10:
+    z = {contents= 0}
+Unknown location:
     _ = ()
-    Execution of main function f's body with env:
-      z = (ref'mk 2)
+File func_call.mlw:
+  Line 11:
+    _ = ()
+    Execution of main function `f` with env:
+      z = {contents= 0}
       _ = ()
       zero = 0
       one = 1
-  Line 12:
-    Concrete execution of Tuple0 with args:
-    Abstract execution of g with args:
-      _ = ()
-    z = (ref'mk 2)
-    result = ()
   Line 13:
-    Property failure, Assertion with:
-      z = (ref'mk 2)
+    Normal execution of function `Tuple0` with args:
+    Giant-step execution of function `g` with args:
+      _ = ()
+    z = {contents= 2}
+    result of `g` = ()
+  Line 14:
+    Property failure at assertion with:
+      z = {contents= 2}
 

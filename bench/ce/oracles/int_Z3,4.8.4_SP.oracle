@@ -1,7 +1,7 @@
 Strongest Postcondition
 File "bench/ce/int.mlw", line 5, characters 50-61:
-Verification condition g_lab.
-Prover result is: unknown (sat).
+Goal g_lab.
+Prover result is: Unknown (sat)
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File int.mlw:
@@ -9,8 +9,8 @@ File int.mlw:
     x [@introduced] [@model] = {"type": "Integer", "val": "48"}
 
 File "bench/ce/int.mlw", line 7, characters 43-54:
-Verification condition g_no_lab.
-Prover result is: unknown (sat).
+Goal g_no_lab.
+Prover result is: Unknown (sat)
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File int.mlw:
@@ -18,8 +18,8 @@ File int.mlw:
     x [@introduced] = {"type": "Integer", "val": "48"}
 
 File "bench/ce/int.mlw", line 11, characters 30-38:
-Verification condition g2_lab.
-Prover result is: unknown (sat).
+Goal g2_lab.
+Prover result is: Unknown (sat)
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File int.mlw:
@@ -29,8 +29,8 @@ File int.mlw:
     x [@introduced] = {"type": "Integer", "val": "1"}
 
 File "bench/ce/int.mlw", line 22, characters 2-45:
-Verification condition newgoal.
-Prover result is: unknown (sat).
+Goal newgoal.
+Prover result is: Unknown (sat)
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File int.mlw:

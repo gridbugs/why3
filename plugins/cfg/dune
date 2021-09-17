@@ -2,7 +2,7 @@
 (menhir (modules ../../src/parser/parser_common cfg_parser)
  (merge_into cfg_parser)
  (infer false)
- (flags --table --explain --strict --external-tokens Cfg_tokens)
+ (flags --table --explain --strict)
   ;table is needed otherwise we have a segfault
 )
 

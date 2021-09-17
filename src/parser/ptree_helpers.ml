@@ -1,3 +1,13 @@
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
 open Ptree
 
@@ -43,6 +53,19 @@ let eapp ?loc f l = expr ?loc (Eidapp(f,l))
 let eapply ?loc e1 e2 = expr ?loc (Eapply(e1,e2))
 
 let evar ?loc x = expr ?loc (Eident x)
+
+let empty_spec = {
+  sp_pre = [];
+  sp_post = [];
+  sp_xpost = [];
+  sp_reads = [];
+  sp_writes = [];
+  sp_alias = [];
+  sp_variant = [];
+  sp_checkrw = false;
+  sp_diverge = false;
+  sp_partial = false;
+}
 
 let use ?(loc=Loc.dummy_position) ~import l =
   let qid_id_opt = (qualid l, None) in

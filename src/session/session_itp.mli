@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -96,6 +96,8 @@ val get_task : session -> proofNodeID -> Task.task
 val get_task_name_table : session -> proofNodeID -> Task.task * Trans.naming_table
 
 val get_transformations : session -> proofNodeID -> transID list
+val get_transformation : session -> proofNodeID -> string -> string list -> transID
+
 val get_proof_attempt_ids :
   session -> proofNodeID -> proofAttemptID Whyconf.Hprover.t
 

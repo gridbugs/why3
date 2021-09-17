@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -65,7 +65,11 @@ let ffalse _ = false
 
 type _ cmptr = Cmptr : {proj: 'a -> 'b; cmp: 'b -> 'b -> int} -> 'a cmptr
 
+type 'a compare = 'a -> 'a -> int
+
 let cmptr proj cmp = Cmptr {proj; cmp}
+
+let cmptr_direct cmp = Cmptr {cmp; proj= fun x -> x}
 
 let rec cmp ls x y = match ls with
   | [] -> 0
@@ -120,3 +124,8 @@ let is_sexp_simple_token s =
           loop (pred i)
       | _ -> false ) in
   String.length s > 0 && loop (pred (String.length s))
+
+let iter_first (type a) iter f =
+  let exception Found of a in
+  let f x = match f x with Some y -> raise (Found y) | None -> () in
+  try iter f; raise Not_found with Found y -> y

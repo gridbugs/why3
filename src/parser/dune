@@ -2,7 +2,7 @@
 (menhir (modules parser_common parser)
  (merge_into parser)
  (infer false)
- (flags --table --explain --strict)
+ (flags --table --explain --strict --external-tokens Parser_tokens)
   ;table is needed otherwise we have a segfault
 )
 

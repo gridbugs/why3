@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -64,7 +64,7 @@ let ident_printer () =
     "integer_log2"; "integer_round"; "is_theory_constant"; "inversion";
     "let"; "linear_dependency"; "logic";
     "max_int"; "max_real"; "min_int"; "min_real";
-    "not"; "not_theory_constant"; "or";
+    "not"; "not_theory_constant"; "of"; "or";
     "parameter"; "predicate"; "pow_real_int"; "pow_real_real";
     "prop";
     "real"; "real_of_int"; "rewriting";
@@ -79,7 +79,7 @@ let ident_printer () =
   create_ident_printer bls ~sanitizer:san
 
 let print_ident info fmt id =
-  fprintf fmt "%s" (id_unique info.info_printer id)
+  pp_print_string fmt (id_unique info.info_printer id)
 
 let print_attr fmt l = fprintf fmt "\"%s\"" l.attr_string
 
@@ -223,8 +223,15 @@ let rec print_term info fmt t =
 		(print_tapp info) tl (print_type info) (t_type t)
 	    end
      end
-  | Tlet _ -> unsupportedTerm t
-      "alt-ergo: you must eliminate let in term"
+  | Tlet (t1, tb) ->
+      let v, t2 = t_open_bound tb in
+      fprintf fmt "(let %a =@ %a@ : %a in@ %a)"
+        (print_ident info) v.vs_name
+        (print_term info) t1
+         (** some version of alt-ergo have an inefficient typing of let *)
+        (print_type info) v.vs_ty
+        (print_term info) t2;
+      forget_var info v
   | Tif(t1,t2,t3) ->
      fprintf fmt "(if %a then %a else %a)"
        (print_fmla info) t1 (print_term info) t2 (print_term info) t3
@@ -291,9 +298,9 @@ and print_fmla_node info fmt f = match f.t_node with
   | Tnot f ->
       fprintf fmt "(not %a)" (print_fmla info) f
   | Ttrue ->
-      fprintf fmt "true"
+      pp_print_string fmt "true"
   | Tfalse ->
-      fprintf fmt "false"
+      pp_print_string fmt "false"
   | Tif(t1,t2,t3) ->
      fprintf fmt "(if %a then %a else %a)"
        (print_fmla info) t1 (print_fmla info) t2 (print_fmla info) t3

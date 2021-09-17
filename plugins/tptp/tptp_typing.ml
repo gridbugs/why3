@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -35,14 +35,14 @@ exception BadArity
 
 let () = Exn_printer.register (fun fmt e -> match e with
   | DuplicateVar s -> fprintf fmt "variable %s is used twice" s
-  | TypeExpected -> fprintf fmt "type expression expected"
-  | TermExpected -> fprintf fmt "term expression expected"
-  | FmlaExpected -> fprintf fmt "formula expression expected"
-  | InvalidDummy -> fprintf fmt "unexpected type placeholder"
-  | MalformedLet -> fprintf fmt "malformed let-expression"
-  | DependentTy  -> fprintf fmt "dependent type"
-  | NonNumeric   -> fprintf fmt "non-numeric argument"
-  | BadArity     -> fprintf fmt "bad arity"
+  | TypeExpected -> pp_print_string fmt "type expression expected"
+  | TermExpected -> pp_print_string fmt "term expression expected"
+  | FmlaExpected -> pp_print_string fmt "formula expression expected"
+  | InvalidDummy -> pp_print_string fmt "unexpected type placeholder"
+  | MalformedLet -> pp_print_string fmt "malformed let-expression"
+  | DependentTy  -> pp_print_string fmt "dependent type"
+  | NonNumeric   -> pp_print_string fmt "non-numeric argument"
+  | BadArity     -> pp_print_string fmt "bad arity"
   | _ -> raise e)
 
 type symbol =

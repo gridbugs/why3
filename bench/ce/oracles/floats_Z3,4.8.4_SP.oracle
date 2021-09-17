@@ -1,7 +1,7 @@
 Strongest Postcondition
 File "bench/ce/floats.mlw", line 5, characters 24-36:
-Verification condition g1.
-Prover result is: unknown (sat).
+Goal g1.
+Prover result is: Unknown (sat)
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File ieee_float.mlw:
@@ -17,8 +17,8 @@ File floats.mlw:
          "value": -1.17549e-38}}
 
 File "bench/ce/floats.mlw", line 7, characters 24-37:
-Verification condition g2.
-Prover result is: unknown (sat).
+Goal g2.
+Prover result is: Unknown (sat)
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File ieee_float.mlw:
@@ -34,8 +34,8 @@ File floats.mlw:
          "value": -1.14794e-41}}
 
 File "bench/ce/floats.mlw", line 9, characters 24-42:
-Verification condition g3.
-Prover result is: unknown (sat).
+Goal g3.
+Prover result is: Unknown (sat)
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File ieee_float.mlw:
@@ -46,8 +46,8 @@ File floats.mlw:
     x [@introduced] = {"type": "Float", "val": {"cons": "Minus_zero"}}
 
 File "bench/ce/floats.mlw", line 11, characters 24-43:
-Verification condition g4.
-Prover result is: unknown (sat).
+Goal g4.
+Prover result is: Unknown (sat)
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File ieee_float.mlw:
@@ -61,8 +61,8 @@ File floats.mlw:
         {"cons": "Float_hexa", "str_hexa": "0x1.400000p0", "value": 1.25}}
 
 File "bench/ce/floats.mlw", line 13, characters 24-43:
-Verification condition g5.
-Prover result is: unknown (sat).
+Goal g5.
+Prover result is: Unknown (sat)
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File ieee_float.mlw:
@@ -76,8 +76,8 @@ File floats.mlw:
         {"cons": "Float_hexa", "str_hexa": "0x1.300004p3", "value": 9.5}}
 
 File "bench/ce/floats.mlw", line 15, characters 24-30:
-Verification condition g6.
-Prover result is: unknown (sat).
+Goal g6.
+Prover result is: Unknown (sat)
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File ieee_float.mlw:
@@ -88,8 +88,8 @@ File floats.mlw:
     x [@introduced] = {"type": "Float", "val": {"cons": "Not_a_number"}}
 
 File "bench/ce/floats.mlw", line 17, characters 40-64:
-Verification condition g7.
-Prover result is: unknown (sat).
+Goal g7.
+Prover result is: Unknown (sat)
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File ieee_float.mlw:
@@ -101,12 +101,12 @@ File floats.mlw:
       {"type": "Float",
        "val":
         {"cons": "Float_hexa",
-         "str_hexa": "-0x1.000004p24",
-         "value": -1.67772e+07}}
+         "str_hexa": "-0x1.000000p25",
+         "value": -3.35544e+07}}
 
 File "bench/ce/floats.mlw", line 19, characters 24-60:
-Verification condition g8.
-Prover result is: unknown (sat).
+Goal g8.
+Prover result is: Unknown (sat)
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File ieee_float.mlw:
@@ -117,8 +117,8 @@ File floats.mlw:
     x [@introduced] = {"type": "Float", "val": {"cons": "Plus_infinity"}}
 
 File "bench/ce/floats.mlw", line 21, characters 40-70:
-Verification condition g9.
-Prover result is: unknown (sat).
+Goal g9.
+Prover result is: Unknown (sat)
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File ieee_float.mlw:
@@ -134,8 +134,8 @@ File floats.mlw:
          "value": 7.00649e-46}}
 
 File "bench/ce/floats.mlw", line 23, characters 24-98:
-Verification condition g10.
-Prover result is: unknown (sat).
+Goal g10.
+Prover result is: Unknown (sat)
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File ieee_float.mlw:
@@ -149,8 +149,8 @@ File floats.mlw:
         {"cons": "Float_hexa", "str_hexa": "0x1.99999ap-4", "value": 0.1}}
 
 File "bench/ce/floats.mlw", line 31, characters 24-36:
-Verification condition g1.
-Prover result is: unknown (sat).
+Goal g1.
+Prover result is: Unknown (sat)
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File ieee_float.mlw:
@@ -166,8 +166,8 @@ File floats.mlw:
          "value": -2.22507e-308}}
 
 File "bench/ce/floats.mlw", line 33, characters 24-37:
-Verification condition g2.
-Prover result is: unknown (sat).
+Goal g2.
+Prover result is: Unknown (sat)
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File ieee_float.mlw:
@@ -183,8 +183,8 @@ File floats.mlw:
          "value": -2.65249e-315}}
 
 File "bench/ce/floats.mlw", line 35, characters 24-42:
-Verification condition g3.
-Prover result is: unknown (sat).
+Goal g3.
+Prover result is: Unknown (sat)
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File ieee_float.mlw:
@@ -195,8 +195,8 @@ File floats.mlw:
     x [@introduced] = {"type": "Float", "val": {"cons": "Minus_zero"}}
 
 File "bench/ce/floats.mlw", line 37, characters 24-43:
-Verification condition g4.
-Prover result is: unknown (sat).
+Goal g4.
+Prover result is: Unknown (sat)
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File ieee_float.mlw:
@@ -212,8 +212,8 @@ File floats.mlw:
          "value": 1.25}}
 
 File "bench/ce/floats.mlw", line 39, characters 24-43:
-Verification condition g5.
-Prover result is: unknown (sat).
+Goal g5.
+Prover result is: Unknown (sat)
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File ieee_float.mlw:
@@ -229,8 +229,8 @@ File floats.mlw:
          "value": 4.25}}
 
 File "bench/ce/floats.mlw", line 41, characters 24-30:
-Verification condition g6.
-Prover result is: unknown (sat).
+Goal g6.
+Prover result is: Unknown (sat)
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File ieee_float.mlw:
@@ -241,8 +241,8 @@ File floats.mlw:
     x [@introduced] = {"type": "Float", "val": {"cons": "Not_a_number"}}
 
 File "bench/ce/floats.mlw", line 43, characters 40-64:
-Verification condition g7.
-Prover result is: unknown (sat).
+Goal g7.
+Prover result is: Unknown (sat)
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File ieee_float.mlw:
@@ -254,12 +254,12 @@ File floats.mlw:
       {"type": "Float",
        "val":
         {"cons": "Float_hexa",
-         "str_hexa": "0x1.0000000000000p105",
-         "value": 4.05648e+31}}
+         "str_hexa": "-0x1.0000000000000p513",
+         "value": -2.68156e+154}}
 
 File "bench/ce/floats.mlw", line 45, characters 24-60:
-Verification condition g8.
-Prover result is: unknown (sat).
+Goal g8.
+Prover result is: Unknown (sat)
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File ieee_float.mlw:
@@ -270,8 +270,8 @@ File floats.mlw:
     x [@introduced] = {"type": "Float", "val": {"cons": "Plus_infinity"}}
 
 File "bench/ce/floats.mlw", line 49, characters 24-98:
-Verification condition g10.
-Prover result is: unknown (sat).
+Goal g10.
+Prover result is: Unknown (sat)
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File ieee_float.mlw:

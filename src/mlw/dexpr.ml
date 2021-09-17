@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -1287,7 +1287,7 @@ let check_unused_vars_fun (bl: Ity.pvsymbol list) (dsp: dspec_final) eff_reads =
 
 (** Abstract values *)
 
-let cty_of_spec env bl mask dsp dity =
+let cty_of_spec loc env bl mask dsp dity =
   let ity = ity_of_dity dity in
   let bl = binders env.ghs bl in
   let env = add_binders env bl in
@@ -1302,7 +1302,14 @@ let cty_of_spec env bl mask dsp dity =
   let xq = create_xpost dsp.ds_xpost in
   (* Check for unused variables *)
   check_unused_vars_fun bl dsp None;
-  create_cty_defensive ~mask bl p q xq (get_oldies old) eff ity
+  let cty = create_cty_defensive ~mask bl p q xq (get_oldies old) eff ity in
+  (* check that oldies are affected by the writes *)
+  let check_affected _ pv =
+    if not (pv_affected cty.cty_effect.eff_writes pv) then Warning.emit ?loc
+      "variable %s is used under `old` but is not modified by the function"
+        pv.pv_vs.vs_name.id_string in
+  Mpv.iter check_affected cty.cty_oldies;
+  cty
 
 (** Expressions *)
 
@@ -1322,8 +1329,6 @@ let get_rs env n = Mstr.find_exn (Dterm.UnboundVar n) n env.rsm
 let get_xs env = function
   | DElexn (n,_) -> Mstr.find_exn (UnboundExn n) n env.xsm
   | DEgexn xs -> xs
-
-let proxy_attrs = Sattr.singleton proxy_attr
 
 type header =
   | LS of let_defn
@@ -1390,6 +1395,7 @@ and try_cexp uloc env ({de_dvty = argl,res} as de0) lpl =
       when Sattr.is_empty e.e_attrs ->
         proxy_args ghost ldl (v::vl) plp
     | EA (gh, e) :: plp ->
+        (* Format.eprintf "[Dexpr.mk_proxy_args] e = %a@." print_expr e; *)
         let ld, v  = mk_proxy_decl ~ghost:(ghost || gh) e in
         proxy_args ghost (LS ld :: ldl) (v::vl) plp
     | HD hd :: plp ->
@@ -1401,13 +1407,20 @@ and try_cexp uloc env ({de_dvty = argl,res} as de0) lpl =
     let argl = List.map ity_of_dity (drop vl argl) in
     env.cgh, ldl, app s vl argl (ity_of_dity res) in
   let c_app s lpl =
+    (* Format.eprintf "[Dexpr.c_app] s = %a@." print_rs s; *)
     let al = List.map (fun v -> v.pv_ghost) s.rs_cty.cty_args in
     let rec full_app al lpl = match al, lpl with
       | _::al, DA _::lpl -> full_app al lpl
       | al, LD _::lpl -> full_app al lpl
       | [], [] -> true | _ -> false in
     let tpl = is_rs_tuple s && full_app al lpl in
-    apply c_app tpl (env.ghs || env.lgh || rs_ghost s) s al lpl in
+    (*let (ghost,ldl,e) = *)
+    apply c_app tpl (env.ghs || env.lgh || rs_ghost s) s al lpl
+      (* in *)
+    (* Format.eprintf "[Dexpr.c_app] e = %a@." (print_cexp true 0) e; *)
+    (*let ld, v = mk_proxy_decl ~ghost e in
+    (ghost,(LS ld)::ldl,v) *)
+  in
   let c_pur ugh s lpl =
     let loc = Opt.get_def de0.de_loc uloc in
     if not (ugh || env.ghs || env.lgh || env.ugh) then Loc.errorm ?loc
@@ -1483,8 +1496,9 @@ and try_cexp uloc env ({de_dvty = argl,res} as de0) lpl =
       check_fun env.inr None dsp c;
       proxy c
   | DEany (bl,dity,msk,dsp) ->
+      let loc = Opt.get_def de0.de_loc uloc in
       let env = {env with ghs = env.ghs || env.lgh} in
-      proxy (c_any (cty_of_spec env bl msk dsp dity))
+      proxy (c_any (cty_of_spec loc env bl msk dsp dity))
   | DElet ((_,_,_,{de_dvty = ([],_)}) as dldf,de) ->
       let ld, env = var_defn uloc env dldf in
       cexp uloc env de (LD (LS ld) :: lpl)
@@ -1682,6 +1696,7 @@ and var_defn uloc env (id,gh,kind,de) =
     | RKfunc | RKpred | RKnone ->
         let e = expr uloc {env with ugh = gh} de in
         e_ghostify env.cgh e in
+  (* Format.eprintf "[Dexpr.var_defn] e = %a@." print_expr e; *)
   let ld, v = let_var id ~ghost:(gh || env.ghs) e in
   ld, add_pvsymbol env v
 

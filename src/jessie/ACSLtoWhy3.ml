@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -1647,7 +1647,8 @@ let global (theories,lemmas,denv,functions) g =
       Self.not_yet_implemented "global: GType"
 
 
-let print_id fmt id = Format.fprintf fmt "%s" id.Ident.id_string
+let print_id fmt id =
+  Format.pp_print_string fmt id.Ident.id_string
 
 let add_pdecl m d =
   let def = Pdecl.create_let_decl d in

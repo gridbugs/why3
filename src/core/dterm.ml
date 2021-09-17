@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -723,9 +723,9 @@ let term ?(strict=true) ?(keep_loc=true) dt =
 
 let () = Exn_printer.register (fun fmt e -> match e with
   | TermExpected ->
-      Format.fprintf fmt "syntax error: term expected"
+      Format.pp_print_string fmt "syntax error: term expected"
   | FmlaExpected ->
-      Format.fprintf fmt "syntax error: formula expected"
+      Format.pp_print_string fmt "syntax error: formula expected"
   | DuplicateVar s ->
       Format.fprintf fmt "duplicate variable %s" s
   | UnboundVar s ->

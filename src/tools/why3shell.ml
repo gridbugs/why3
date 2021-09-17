@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -141,9 +141,9 @@ let get_result pa =
 let print_proof_attempt fmt pa_id =
   let pa = Hnode.find nodes pa_id in
   match pa.node_proof with
-  | None -> fprintf fmt "%s" pa.node_name
+  | None -> pp_print_string fmt pa.node_name
   | Some _pr ->
-    fprintf fmt "%s %a"
+    fprintf fmt "@[<h>%s %a@]"
       pa.node_name
       (Pp.print_option (Call_provers.print_prover_result ~json:false))
       (get_result pa.node_proof)
@@ -156,9 +156,9 @@ let rec print_proof_node (fmt: formatter) goal_id =
     goal_id = !cur_id
   in
   if current_goal then
-    fprintf fmt "**";
+    pp_print_string fmt "**";
   if goal.node_proved then
-    fprintf fmt "P";
+    pp_print_string fmt "P";
   let proof_attempts, transformations =
     List.partition (fun n -> let node = Hnode.find nodes n in
       node.node_type = SProofAttempt) goal.children_nodes
@@ -172,7 +172,7 @@ let rec print_proof_node (fmt: formatter) goal_id =
     (Pp.print_list Pp.semi print_trans_node) transformations;
 
   if current_goal then
-    fprintf fmt " **"
+    pp_print_string fmt " **"
 
 and print_trans_node fmt id =
   let trans = Hnode.find nodes id in
@@ -182,7 +182,7 @@ and print_trans_node fmt id =
   let parent = Hnode.find nodes trans.node_parent in
   let parent_name = parent.node_name in
   if trans.node_proved then
-    fprintf fmt "P";
+    pp_print_string fmt "P";
   fprintf fmt "@[<hv 2>{ Trans=%s;@ args=%a;@ parent=%s;@ [%a] }@]" name
     (Pp.print_option (Pp.print_list Pp.semi pp_print_string)) args parent_name
     (Pp.print_list Pp.semi print_proof_node) l
@@ -190,7 +190,7 @@ and print_trans_node fmt id =
 let print_theory fmt th_id : unit =
   let th = Hnode.find nodes th_id in
   if th.node_proved then
-    fprintf fmt "P";
+    pp_print_string fmt "P";
   fprintf fmt "@[<hv 1> Theory %s, id: %d;@ [%a]@]" th.node_name th_id
     (Pp.print_list Pp.semi print_proof_node) th.children_nodes
 
@@ -387,18 +387,17 @@ let spec =
    " remove all printing to stdout"]
 
 (* --help *)
-let usage_str = Format.sprintf
-  "Usage: %s [options] [ <file.xml> | <f1.why> <f2.mlw> ...]\n\
-   Launch a command-line interface for Why3.\n"
-  (Filename.basename Sys.argv.(0))
+let usage_str =
+  "[<file.xml>|<f1.why> <f2.mlw> ...]\n\
+   Launch a command-line interface for Why3."
 
 (* Parse files *)
-let config, base_config, env =
-  let config, base_config, env =
+let config, env =
+  let config, env =
     Whyconf.Args.initialize spec (fun f -> Queue.add f files) usage_str in
   if Queue.is_empty files then
     Whyconf.Args.exit_with_usage spec usage_str;
-  (config, base_config, env)
+  (config, env)
 
 let () =
   let fmt = if !quiet then str_formatter else std_formatter in

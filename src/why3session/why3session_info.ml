@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -234,7 +234,7 @@ and stats2_of_transf ~nb_proofs ses tr : (proofNodeID * goal_stat) list =
     [] (get_sub_tasks ses tr)
 
 let print_res ~time fmt (p,t) =
-  fprintf fmt "%a" print_prover p;
+  print_prover fmt p;
   if time then fprintf fmt " (%.2f)" t
 
 let rec print_goal_stats ~time depth ses (g,l) =
@@ -422,7 +422,7 @@ let print_hist stats =
 (****** run on all files  ******)
 
 let run () =
-  let _,_,_ = Whyconf.Args.complete_initialization () in
+  let _,_ = Whyconf.Args.complete_initialization () in
   let stats = new_proof_stats () in
   let r0 = ref [] and r1 = ref [] in
   iter_files (run_one stats r0 r1);

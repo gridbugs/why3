@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -257,7 +257,7 @@ let help_on_queries fmt commands =
   let l = Hstr.fold (fun c (h,_) acc -> (c,h)::acc) commands [] in
   let l = List.sort sort_pair l in
   let p fmt (c,help) = Format.fprintf fmt "%20s : %s" c help in
-  Format.fprintf fmt "%a" (Pp.print_list Pp.newline p) l
+  Pp.print_list Pp.newline p fmt l
 
 (* Return the prover corresponding to given name. name is of the form
   | name

@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -24,7 +24,7 @@ let ident_printer =
   create_ident_printer bls ~sanitizer:san
 
 let print_ident fmt id =
-  fprintf fmt "%s" (id_unique ident_printer id)
+  pp_print_string fmt (id_unique ident_printer id)
 
 let forget_var v = forget_id ident_printer v.vs_name
 
@@ -77,8 +77,9 @@ and print_fmla info fmt f = match f.t_node with
       | Some s ->
           syntax_arguments s (print_term info) fmt tl
       | None ->
-          fprintf fmt "(EQ (%a@ %a) |@@true|)"
-            print_ident ls.ls_name (print_list space (print_term info)) tl
+         (* `%@` prints a single `@` *)
+         fprintf fmt "(EQ (%a@ %a) |%@true|)"
+           print_ident ls.ls_name (print_list space (print_term info)) tl
     end
   | Tquant (q, fq) ->
       let q = match q with Tforall -> "FORALL" | Texists -> "EXISTS" in
@@ -98,9 +99,9 @@ and print_fmla info fmt f = match f.t_node with
   | Tnot f ->
       fprintf fmt "@[(NOT@ %a)@]" (print_fmla info) f
   | Ttrue ->
-      fprintf fmt "TRUE"
+      pp_print_string fmt "TRUE"
   | Tfalse ->
-      fprintf fmt "FALSE"
+      pp_print_string fmt "FALSE"
   | Tif _ ->
       unsupportedTerm f "simplify: you must eliminate if"
   | Tlet _ ->

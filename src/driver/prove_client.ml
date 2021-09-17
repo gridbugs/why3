@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -247,9 +247,9 @@ let read_answers ~blocking =
 
 let () = Exn_printer.register (fun fmt exn -> match exn with
   | NotConnected ->
-      Format.fprintf fmt "Not connected to the proof server"
+      Format.pp_print_string fmt "Not connected to the proof server"
   | AlreadyConnected ->
-      Format.fprintf fmt "Already connected to the proof server"
+      Format.pp_print_string fmt "Already connected to the proof server"
   | InvalidAnswer s ->
       Format.fprintf fmt "Invalid server answer: %s" s
   | ConnectionError s ->

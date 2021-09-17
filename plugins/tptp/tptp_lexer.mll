@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -26,7 +26,7 @@
 
   let () = Exn_printer.register (fun fmt e -> match e with
     | IllegalLexeme s -> fprintf fmt "illegal lexeme %s" s
-    | UnterminatedComment -> fprintf fmt "unterminated comment"
+    | UnterminatedComment -> pp_print_string fmt "unterminated comment"
     | UnknownDDW s -> fprintf fmt "unknown system_word %s" s
     | UnknownDW s -> fprintf fmt "unknown defined_word %s" s
     | _ -> raise e)

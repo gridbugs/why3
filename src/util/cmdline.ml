@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -99,5 +99,5 @@ let () = Exn_printer.register (fun fmt e -> match e with
   | UnclosedDQuote s ->
       Format.fprintf fmt "unclosed double quote in string: %s" s
   | EmptyCommandLine ->
-      Format.fprintf fmt "empty command line"
+      Format.pp_print_string fmt "empty command line"
   | _ -> raise e)

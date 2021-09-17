@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -118,7 +118,8 @@ let rec basename p =
   | _ :: tl -> basename tl
 
 (* deprecated: let string_of_file_path p = String.concat "/" p *)
-let print_file_path fmt p = Format.fprintf fmt "%a" (Pp.print_list Pp.slash Pp.string) p
+let print_file_path fmt p =
+  Pp.print_list Pp.slash Pp.string fmt p
 
 
 let system_independent_path_of_file f =

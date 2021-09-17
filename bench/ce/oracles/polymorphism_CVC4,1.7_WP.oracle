@@ -1,7 +1,7 @@
 Weakest Precondition
 File "bench/ce/polymorphism.mlw", line 7, characters 27-34:
-Verification condition gm.
-Prover result is: unknown (sat).
+Goal gm.
+Prover result is: Unknown (sat)
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File polymorphism.mlw:
@@ -11,8 +11,8 @@ File polymorphism.mlw:
        "val": {"apply": "B", "list": [{"type": "Integer", "val": "1"}]}}
 
 File "bench/ce/polymorphism.mlw", line 11, characters 22-35:
-Verification condition gm2.
-Prover result is: unknown (sat).
+Goal gm2.
+Prover result is: Unknown (sat)
 The following counterexample model has not been verified
   (not checking CE model, missing option --check-ce):
 File polymorphism.mlw:
@@ -25,6 +25,6 @@ File polymorphism.mlw:
           [{"type": "Integer", "val": "0"}, {"type": "Boolean", "val": true}]}}
 
 File "bench/ce/polymorphism.mlw", line 15, characters 30-37:
-Verification condition g.
-Prover result is: timeout or unknown.
+Goal g.
+Prover result is: Unknown or time/memory/step limit.
 

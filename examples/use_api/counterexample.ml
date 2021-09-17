@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -12,7 +12,7 @@
 (*******************
 
 This file builds some goals based on logic.ml using the API and calls
-the cvc4 to query counterexamples for them
+CVC4 to query counterexamples for them
 
 Note: the comments of the form BEGIN{id} and END{id} are there for automatic extraction
 of the chapter "The Why3 API" of the manual
@@ -75,9 +75,8 @@ let () = printf "@[task 2 created:@\n%a@]@." Pretty.print_task task2
 
 (* To call a prover, we need to access the Why configuration *)
 
-(* reads the config file *)
-let config : Whyconf.config =
-  Whyconf.(load_default_config_if_needed (read_config None))
+(* reads the default config file *)
+let config = Whyconf.init_config None
 (* the [main] section of the config file *)
 let main : Whyconf.main = Whyconf.get_main config
 (* all the provers detected, from the config file *)
@@ -85,32 +84,31 @@ let provers : Whyconf.config_prover Whyconf.Mprover.t =
   Whyconf.get_provers config
 
 (* BEGIN{ce_get_cvc4ce} *)
-(* One alternative for Cvc4 with counterexamples in the config file *)
+(* One alternative for CVC4 with counterexamples in the config file *)
 let cvc4 : Whyconf.config_prover =
-  let fp = Whyconf.parse_filter_prover "CVC4,,counterexamples" in
-  (* All provers alternative counterexamples that have the name CVC4 *)
+  let fp = Whyconf.parse_filter_prover "CVC4,1.7,counterexamples" in
+  (* All provers alternative counterexamples that have the name CVC4 and version 1.7 *)
   let provers = Whyconf.filter_provers config fp in
   if Whyconf.Mprover.is_empty provers then begin
-    eprintf "Prover Cvc4 not installed or not configured@.";
+    eprintf "Prover CVC4 1.7 not installed or not configured@.";
     exit 1
   end else
-    (* Most recent version found *)
     snd (Whyconf.Mprover.max_binding provers)
 (* END{ce_get_cvc4ce} *)
 
 (* builds the environment from the [loadpath] *)
 let env : Env.env = Env.create_env (Whyconf.loadpath main)
 
-(* loading the Cvc4 driver *)
+(* loading the CVC4 driver *)
 let cvc4_driver : Driver.driver =
   try
     Whyconf.load_driver main env cvc4
   with e ->
-    eprintf "Failed to load driver for Cvc4: %a@."
+    eprintf "Failed to load driver for CVC4,1.7: %a@."
       Exn_printer.exn_printer e;
     exit 1
 
-(* calls Cvc4 *)
+(* calls CVC4 *)
 let result1 : Call_provers.prover_result =
   Call_provers.wait_on_call
     (Driver.prove_task ~limit:Call_provers.empty_limit
@@ -118,14 +116,84 @@ let result1 : Call_provers.prover_result =
     cvc4_driver task2)
 
 (* BEGIN{ce_callprover} *)
-(* prints Cvc4 answer *)
-let () = printf "@[On task 1, Cvc4 answers %a@."
+(* prints CVC4 answer *)
+let () = printf "@[On task 1, CVC4,1.7 answers %a@."
     (Call_provers.print_prover_result ?json:None) result1
 
 let () = printf "Model is %t@."
     (fun fmt ->
-       match result1.Call_provers.pr_models with
-       | [(_,m)] -> (* TODO select_model *)
-           Model_parser.print_model_json ?me_name_trans:None ?vc_line_trans:None fmt m
-       | _ -> fprintf fmt "unavailable")
+       match Check_ce.select_model_last_non_empty
+                result1.Call_provers.pr_models with
+       | Some m -> Model_parser.print_model_json fmt m
+       | None -> fprintf fmt "unavailable")
 (* END{ce_callprover} *)
+
+(* Construct program:
+   module M =
+     let f (x: int) = assert { x <> 42 }
+   end *)
+let mlw_file =
+  let loc () = (* The counterexample selections requires unique locations *)
+    Mlw_printer.id_loc () in
+  let open Ptree in
+  let open Ptree_helpers in
+  let let_f =
+    let equ = Qident (ident ~loc:(loc ()) Ident.op_equ) in
+    let t_x = tvar ~loc:(loc ()) (Qident (ident "x")) in
+    let t_42 = tconst ~loc:(loc ()) 42 in
+    let t = term ~loc:(loc ()) (Tidapp (equ, [t_x; t_42])) in
+    let t = term ~loc:(loc ()) (Tnot t) in
+    let body = expr ~loc:(loc ()) (Eassert (Expr.Assert, t)) in
+    let pty_int = PTtyapp (Qident (ident "int"), []) in
+    let arg = loc (), Some (ident ~loc:(loc ()) "x"), false, Some pty_int in
+    let efun =
+      Efun ([arg], None, pat Ptree.Pwild, Ity.MaskVisible, empty_spec, body) in
+    let e = expr ~loc:(loc ()) efun in
+    Dlet (ident "f", false, Expr.RKnone, e) in
+  Decls [let_f]
+
+let pm =
+  let pms = Typing.type_mlw_file env [] "myfile.mlw" mlw_file in
+  Wstdlib.Mstr.find "" pms
+
+let task =
+  match Task.split_theory pm.Pmodule.mod_theory None None with
+  | [task] -> task
+  | _ -> failwith "Not exactly one task"
+
+let {Call_provers.pr_models= models} =
+  Call_provers.wait_on_call
+    (Driver.prove_task ~limit:Call_provers.empty_limit
+       ~command:(Whyconf.get_complete_command cvc4 ~with_steps:false)
+       cvc4_driver task)
+
+let () = print_endline "\n== Check CE"
+
+(* BEGIN{check_ce} *)
+let () =
+  let rac = Pinterp.mk_rac ~ignore_incomplete:false
+      (Rac.Why.mk_check_term_lit config env ~why_prover:"alt-ergo" ()) in
+  let model, clsf = Opt.get_exn (Failure "No good model found")
+      (Check_ce.select_model ~check_ce:true rac env pm models) in
+  printf "%a@." (Check_ce.print_model_classification
+                   ~check_ce:true ?verb_lvl:None ?json:None) (model, clsf)
+(* END{check_ce} *)
+
+let () = print_endline "\n== RAC execute giant steps\n"
+
+(* BEGIN{check_ce_giant_step} *)
+let () =
+  let model = Opt.get_exn (Failure "No non-empty model")
+      (Check_ce.select_model_last_non_empty models) in
+  let loc = Opt.get_exn (Failure "No model term location")
+      (Model_parser.get_model_term_loc model) in
+  let rs = Opt.get_exn (Failure "No procedure symbol found")
+      (Check_ce.find_rs pm loc) in
+  let rac = Pinterp.mk_rac ~ignore_incomplete:false
+      (Rac.Why.mk_check_term_lit config env ~why_prover:"alt-ergo" ()) in
+  let oracle = Check_ce.oracle_of_model pm model in
+  let env = Pinterp.mk_empty_env env pm in
+  let ctx = Pinterp.mk_ctx env ~do_rac:true ~rac ~giant_steps:true ~oracle () in
+  let res = Check_ce.rac_execute ctx rs in
+  printf "%a@." (Check_ce.print_rac_result ?verb_lvl:None) res
+(* END{check_ce_giant_step} *)

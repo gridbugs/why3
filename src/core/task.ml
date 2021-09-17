@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -362,9 +362,9 @@ let on_tagged_pr t task =
 (* Exception reporting *)
 
 let () = Exn_printer.register (fun fmt exn -> match exn with
-  | LemmaFound ->   Format.fprintf fmt "Task cannot contain a lemma"
-  | GoalFound ->    Format.fprintf fmt "The task already ends with a goal"
-  | GoalNotFound -> Format.fprintf fmt "The task does not end with a goal"
+  | LemmaFound ->   Format.pp_print_string fmt "Task cannot contain a lemma"
+  | GoalFound ->    Format.pp_print_string fmt "The task already ends with a goal"
+  | GoalNotFound -> Format.pp_print_string fmt "The task does not end with a goal"
   | NotTaggingMeta m ->
       Format.fprintf fmt "Metaproperty '%s' is not a symbol tag" m.meta_name
   | NotExclusiveMeta m ->

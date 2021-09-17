@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -26,6 +26,7 @@ Require bv.Pow2int.
 Require ieee_float.RoundingMode.
 Require ieee_float.GenericFloat.
 
+Require Import Lia.
 Import Flocq.Core.Core.
 Import Flocq.IEEE754.Binary.
 Import ieee_float.RoundingMode.
@@ -82,7 +83,7 @@ apply Digits.Zpower_gt_Zdigits.
 revert H1.
 generalize (Digits.Zdigits radix2 (Z.pos m)).
 unfold FLT_exp, sb.
-intros ; zify ; omega.
+intros ; lia.
 now apply bpow_le.
 Qed.
 

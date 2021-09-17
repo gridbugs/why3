@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -90,7 +90,7 @@ type prog_pattern = private {
 
 type pre_pattern =
   | PPwild
-  | PPvar of preid * bool
+  | PPvar of preid * bool (** preid * if ghost *)
   | PPapp of rsymbol * pre_pattern list
   | PPas  of pre_pattern * preid * bool
   | PPor  of pre_pattern * pre_pattern
@@ -207,6 +207,8 @@ val e_var : pvsymbol -> expr
 
 val e_const : Constant.constant -> ity -> expr
 val e_nat_const : int -> expr
+
+val proxy_attrs : Sattr.t
 
 val mk_proxy_decl : ghost:bool -> expr -> let_defn * pvsymbol
 (** [mk_proxy_decl ~ghost e] returns a pair [(ld,v)] providing a fresh

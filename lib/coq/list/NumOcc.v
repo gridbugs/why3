@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -19,6 +19,8 @@ Require list.Length.
 Require list.Mem.
 Require list.Append.
 Require list.Reverse.
+
+Require Import Lia.
 
 (* Why3 goal *)
 Definition num_occ {a:Type} {a_WT:WhyType a} :
@@ -53,12 +55,13 @@ Qed.
 (* Why3 goal *)
 Lemma Num_Occ_NonNeg {a:Type} {a_WT:WhyType a} :
   forall (x:a) (l:Init.Datatypes.list a), (0%Z <= (num_occ x l))%Z.
+Proof.
 intros x l.
 induction l as [|lh lt IHl].
 easy.
 simpl.
 case why_decidable_eq ; intros H.
-omega.
+lia.
 easy.
 Qed.
 
@@ -75,7 +78,7 @@ case why_decidable_eq ; intros H ; split.
 intros _.
 clear.
 generalize (Num_Occ_NonNeg x lt).
-omega.
+lia.
 now left.
 intros [H'|H'] ; try easy.
 now apply IHl.

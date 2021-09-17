@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -123,7 +123,7 @@ let () = Exn_printer.register
     | Located (loc,e) ->
         fprintf fmt "%a%a" report_position loc Exn_printer.exn_printer e
     | Message s ->
-        fprintf fmt "%s" s
+        pp_print_string fmt s
     | _ ->
         raise exn)
 

@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -19,6 +19,8 @@ Require list.Nth.
 Require option.Option.
 Require list.HdTl.
 
+Require Import Lia.
+
 (* Why3 goal *)
 Lemma Nth_tl {a:Type} {a_WT:WhyType a} :
   forall (l1:Init.Datatypes.list a) (l2:Init.Datatypes.list a),
@@ -33,7 +35,7 @@ generalize (Zeq_bool_if (i + 1) 0).
 case Zeq_bool.
 intro H.
 exfalso.
-omega.
+lia.
 intros _.
 simpl in h1.
 inversion h1.

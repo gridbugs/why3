@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -374,6 +374,54 @@ unfold mem.
 intros x.
 rewrite Bool.andb_true_iff.
 destruct (s2 x); intuition.
+Qed.
+
+(* Why3 goal *)
+Definition product {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b} :
+  (a -> Init.Datatypes.bool) -> (b -> Init.Datatypes.bool) ->
+  (a* b)%type -> Init.Datatypes.bool.
+Proof.
+  intros sx sy xy.
+  destruct xy as [x y].
+  exact (andb (sx x) (sy y)).
+Defined.
+
+(* Why3 goal *)
+Lemma product_def {a:Type} {a_WT:WhyType a} {b:Type} {b_WT:WhyType b} :
+  forall (s1:a -> Init.Datatypes.bool) (s2:b -> Init.Datatypes.bool) 
+    (x:a) (y:b),
+  mem (x, y) (product s1 s2) <-> mem x s1 /\ mem y s2.
+Proof.
+intros s1 s2 x y.
+apply Bool.andb_true_iff.
+Qed.
+
+(* Why3 goal *)
+Definition filter {a:Type} {a_WT:WhyType a} :
+  (a -> Init.Datatypes.bool) -> (a -> Init.Datatypes.bool) ->
+  a -> Init.Datatypes.bool.
+Proof.
+  intros s1 s2 e.
+  exact (andb (s1 e) (s2 e)).
+Defined.
+
+(* Why3 goal *)
+Lemma filter_def {a:Type} {a_WT:WhyType a} :
+  forall (s:a -> Init.Datatypes.bool) (p:a -> Init.Datatypes.bool) (x:a),
+  mem x (filter s p) <-> mem x s /\ ((p x) = Init.Datatypes.true).
+Proof.
+intros s p x.
+apply Bool.andb_true_iff.
+Qed.
+
+(* Why3 goal *)
+Lemma subset_filter {a:Type} {a_WT:WhyType a} :
+  forall (s:a -> Init.Datatypes.bool) (p:a -> Init.Datatypes.bool),
+  subset (filter s p) s.
+Proof.
+intros s p x H.
+destruct (andb_prop _ _ H) as [H1 _].
+exact H1.
 Qed.
 
 (* Why3 goal *)

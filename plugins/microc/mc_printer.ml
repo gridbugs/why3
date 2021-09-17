@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -16,10 +16,10 @@ open Term
 
 (* microc print_binop *)
 let print_binop fmt = function
-  | Tand           -> fprintf fmt "&&"
-  | Tor            -> fprintf fmt "||"
-  | Timplies       -> fprintf fmt "->"
-  | Tiff           -> fprintf fmt "<->"
+  | Tand           -> pp_print_string fmt "&&"
+  | Tor            -> pp_print_string fmt "||"
+  | Timplies       -> pp_print_string fmt "->"
+  | Tiff           -> pp_print_string fmt "<->"
 
 let rec microc_ext_printer print_any fmt a =
   match a with

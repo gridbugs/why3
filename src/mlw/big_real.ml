@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -39,7 +39,7 @@ let init, set_exponents, get_prec, get_zero, get_one =
   (fun () -> !one)
 
 let print_float fmt x =
-  Format.fprintf fmt "%s" (get_formatted_str ~base:10 x)
+  Format.pp_print_string fmt (get_formatted_str ~base:10 x)
 
 let print_real fmt (x, y) =
   Format.fprintf fmt "[%a, %a]" print_float x print_float y

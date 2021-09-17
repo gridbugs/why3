@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -377,7 +377,9 @@ let e_attr_copy { e_attrs = attrs; e_loc = loc } e =
 
 let proxy_attrs = Sattr.singleton proxy_attr
 
-let rec e_attr_push ?loc l e = match e.e_node with
+let rec e_attr_push ?loc l e =
+  let loc = if e.e_loc = None then loc else e.e_loc in
+  match e.e_node with
   | (Elet (LDvar ({pv_vs = {vs_name = id}},_) as ld, e1)
   |  Elet (LDsym ({rs_name = id},_) as ld, e1))
     when Sattr.mem proxy_attr id.id_attrs ->
@@ -794,19 +796,43 @@ let c_pur s vl ityl ity =
   let cty = create_cty v_args [] [q] Mxs.empty Mpv.empty eff ity in
   mk_cexp (Cpur (s,vl)) cty
 
-let mk_proxy_decl ~ghost e =
-  let id =
-    match e.e_node with
-    | Eexec ({ c_node = Capp (_rs,_)},cty) ->
-       result_id ?loc:e.e_loc ~attrs:proxy_attrs ~ql:cty.cty_post ()
-    | Eexec ({ c_node = Cpur _},_) ->
-       result_id ?loc:e.e_loc ~attrs:proxy_attrs ()
-    | _ ->
-       id_fresh ?loc:e.e_loc ~attrs:proxy_attrs "o"
-  in
-  let_var ~ghost id e
+let print_expr_hook = ref (fun fmt _e -> Format.pp_print_string fmt "Expr.print_expr_hook not set!")
+let print_rs_hook = ref (fun fmt _rs -> Format.pp_print_string fmt "Expr.print_rs_hook not set!")
 
-let mk_proxy ghost e hd = match e.e_node with
+let mk_proxy_decl ~ghost e =
+(*  Format.eprintf "[Expr.mk_proxy_decl] e = %a@." !print_expr_hook e; *)
+(*
+  let mk_attrs id =
+    let s = Format.asprintf "%a'result" Ident.print_decoded id.id_string in
+    let a = create_model_trace_attr s in
+    (*    let b = create_model_loc_attr id.id_loc in *)
+    let at = Sattr.add a proxy_attrs in
+    match id.id_loc with
+    | None -> at
+    | Some l ->
+       let s = Format.asprintf "model_loc:%a" Loc.gen_report_position l in
+       let b = create_attribute s in
+       Sattr.add b at
+  in
+ *)
+  let (* rec *) find_id e =
+     match e.e_node with
+(*
+     | Eexec ({ c_node = Capp (rs,_)},cty) ->
+        let attrs = mk_attrs rs.rs_name in
+        result_id ?loc:e.e_loc ~attrs ~ql:cty.cty_post ()
+     | Eexec ({ c_node = Cpur (ls,_)},_) ->
+        let attrs = mk_attrs ls.ls_name in
+        result_id ?loc:e.e_loc ~attrs ()
+     | Elet(_,e) -> find_id e
+ *)
+     | _ ->
+        id_fresh ?loc:e.e_loc ~attrs:proxy_attrs "o"
+  in
+  let_var ~ghost (find_id e) e
+
+let mk_proxy ghost e hd =
+  match e.e_node with
   | Evar v when Sattr.is_empty e.e_attrs -> hd, v
   | _ ->
       let ld, v = mk_proxy_decl ~ghost e in ld::hd, v
@@ -1453,7 +1479,7 @@ and print_enode pri fmt e = match e.e_node with
   | Eraise (xs,e) ->
       fprintf fmt "raise (%a %a)" print_xs xs print_expr e
   | Eabsurd ->
-      fprintf fmt "absurd"
+      pp_print_string fmt "absurd"
   | Eassert (Assert,f) ->
       fprintf fmt "assert { %a }" print_term f
   | Eassert (Assume,f) ->
@@ -1513,6 +1539,10 @@ and print_rec_fun fst fmt fd =
     print_variant fd.rec_varl
     (print_lexpr 0 (*4*)) e;
   forget_cty fd.rec_fun.c_cty
+
+let () =
+  print_expr_hook := print_expr;
+  print_rs_hook := print_rs
 
 (* exception handling *)
 

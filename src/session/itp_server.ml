@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -147,7 +147,7 @@ let p s id =
 
 let print_opt_type ~print_type fmt t =
   match t with
-  | None -> Format.fprintf fmt "bool"
+  | None -> Format.pp_print_string fmt "bool"
   | Some t -> print_type fmt t
 
 (* Exception reporting *)
@@ -171,7 +171,7 @@ let bypass_pretty s id =
   | Ty.UnboundTypeVar tv ->
       fprintf fmt "Unbound type variable: %a" P.print_tv tv
   | Ty.UnexpectedProp ->
-      fprintf fmt "Unexpected propositional type"
+      pp_print_string fmt "Unexpected propositional type"
   | Term.BadArity ({Term.ls_args = []} as ls, _) ->
       fprintf fmt "%s %a expects no arguments"
         (if ls.Term.ls_value = None then "Predicate" else "Function") P.print_ls ls
@@ -181,7 +181,7 @@ let bypass_pretty s id =
         (if ls.Term.ls_value = None then "Predicate" else "Function")
         P.print_ls ls i (if i = 1 then "" else "s") app_arg
   | Term.EmptyCase ->
-      fprintf fmt "Empty match expression"
+      pp_print_string fmt "Empty match expression"
   | Term.DuplicateVar vs ->
       fprintf fmt "Variable %a is used twice" P.print_vsty vs
   | Term.UncoveredVar vs ->
@@ -237,7 +237,7 @@ let bypass_pretty s id =
   | Decl.ClashIdent id ->
       fprintf fmt "Ident %s is defined twice" id.Ident.id_string
   | Decl.EmptyDecl ->
-      fprintf fmt "Empty declaration"
+      pp_print_string fmt "Empty declaration"
   | Decl.EmptyAlgDecl ts ->
       fprintf fmt "Algebraic type %a has no constructors" P.print_ts ts
   | Decl.EmptyIndDecl ls ->
@@ -301,7 +301,7 @@ let get_exception_message ses id e =
   | Generic_arg_trans_utils.Arg_trans_missing (s, svs) ->
       Pp.sprintf "Error in transformation function:\n%s %a\n" s
         (* The arguments should appear on one line (no @) *)
-        (Pp.print_list (fun fmt () -> fprintf fmt ", ") P.print_vs)
+        (Pp.print_list (fun fmt () -> pp_print_string fmt ", ") P.print_vs)
         (Term.Svs.elements svs),
       Loc.dummy_position, ""
   | Generic_arg_trans_utils.Arg_bad_hypothesis ("rewrite", _t) ->
@@ -323,11 +323,10 @@ let get_exception_message ses id e =
       Pp.sprintf "Parsing error: %a" Exn_printer.exn_printer e, loc, arg
   | Trans.Unnecessary_arguments l ->
       Pp.sprintf "First arguments were parsed and typed correctly but the last following are useless:\n%a"
-        (Pp.print_list Pp.newline (fun fmt s -> Format.fprintf fmt "%s" s)) l, Loc.dummy_position, ""
+        (Pp.print_list Pp.newline pp_print_string) l, Loc.dummy_position, ""
   | Generic_arg_trans_utils.Unnecessary_terms l ->
       Pp.sprintf "First arguments were parsed and typed correctly but the last following are useless:\n%a"
-        (Pp.print_list Pp.newline
-           (fun fmt s -> Format.fprintf fmt "%a" P.print_term s)) l, Loc.dummy_position, ""
+        (Pp.print_list Pp.newline P.print_term) l, Loc.dummy_position, ""
   | Args_wrapper.Arg_expected_none s ->
       Pp.sprintf "An argument was expected of type %s, none were given" s, Loc.dummy_position, ""
   | e ->
@@ -1005,17 +1004,12 @@ match pa.proof_state with
    begin
      let open Call_provers in
      let result = Pp.string_of print_prover_answer res.pr_answer in
-     let cont = d.cont in
+     let {controller_env= env} as cont = d.cont in
      let selected_model =
        let th = Session_itp.find_th cont.controller_session parid in
        let pm = Pmodule.restore_module (Theory.restore_theory (theory_name th)) in
-       let env = cont.controller_env in
-       let reduce_config =
-         let trans = "compute_in_goal" and prover = None in
-         Pinterp.rac_reduce_config_lit cont.controller_config env ~trans ?prover () in
-       let sel =
-         Counterexample.select_model ~check:true
-           ~reduce_config env pm res.pr_models in
+       let rac = Pinterp.mk_rac (Rac.Why.mk_check_term_lit cont.controller_config env ()) in
+       let sel = Check_ce.select_model ~check_ce:true rac env pm res.pr_models in
        match sel with None -> Model_parser.empty_model | Some (m,_) -> m in
      let ce_result =
        Pp.string_of (Model_parser.print_model_human ~filter_similar:true ~print_attrs ?me_name_trans:None)

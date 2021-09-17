@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2020   --   Inria - CNRS - Paris-Sud University  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -108,7 +108,7 @@ let handler (addr,req) script cont fmt =
        Wserver.http_header fmt "HTTP/1.0 200 OK";
        fprintf fmt "Access-Control-Allow-Origin: *\n";
        fprintf fmt "\n"; (* end of header *)
-       fprintf fmt "%s" ans;
+       pp_print_string fmt ans;
        fprintf fmt "@."
 
 let help () =
@@ -136,14 +136,12 @@ let spec =
     Termcode.opt_extra_expl_prefix;
   ]
 
-let usage_str = sprintf
-  "Usage: %s [options] [<file.why>|<project directory>]...\n\
-   Launch a web server that provides a graphical interface for Why3.\n"
-  (Filename.basename Sys.argv.(0))
-
+let usage_str =
+  "[<file.why>|<project directory>]...\n\
+   Launch a web server that provides a graphical interface for Why3."
 
 let () =
-    let config, _base_config, env =
+    let config, env =
       Whyconf.Args.initialize spec (fun f -> Queue.add f files) usage_str
     in
     let dir =
