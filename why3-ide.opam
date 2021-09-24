@@ -27,6 +27,9 @@ doc: "http://why3.lri.fr/doc/"
 bug-reports: "https://gitlab.inria.fr/why3/why3/issues"
 depends: [
   "dune" {>= "2.8"}
+  "why3"
+  "lablgtk3"
+  "lablgtk3-sourceview3"
   "odoc" {with-doc}
 ]
 build: [

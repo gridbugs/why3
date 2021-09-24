@@ -318,48 +318,6 @@ $(LIBCMX): OFLAGS += -for-pack Why3
 
 $(LIBDEP): $(LIBGENERATED)
 
-ifeq (@new_dynlink@,yes)
-src/util/dynlink_wrapper.ml: src/util/dynlink_new.ml Makefile
-	$(CMP_CP)
-else
-src/util/dynlink_wrapper.ml: src/util/dynlink_old.ml Makefile
-	$(CMP_CP)
-endif
-
-# Mlmpfr
-
-ifeq (@found_mlmpfr@,yes)
-src/util/mlmpfr_wrapper.ml: src/util/mlmpfr_real.ml Makefile
-	$(CMP_CP)
-else
-src/util/mlmpfr_wrapper.ml: src/util/mlmpfr_dummy.ml Makefile
-	$(CMP_CP)
-endif
-
-# Ocamlzip
-
-ifeq (@enable_zip@,yes)
-src/session/compress.ml: src/session/compress_z.ml Makefile
-	$(CMP_CP)
-else
-src/session/compress.ml: src/session/compress_none.ml Makefile
-	$(CMP_CP)
-endif
-
-# pp_sexp_conv
-
-ifeq (@enable_pp_sexp@, yes)
-src/util/mysexplib.ml: src/util/mysexplib-real.ml Makefile
-	$(CMP_CP)
-src/tools/why3pp_sexp.ml: src/tools/why3pp_sexp-real.ml Makefile
-	$(CMP_CP)
-else
-src/util/mysexplib.ml: src/util/mysexplib-dummy.ml Makefile
-	$(CMP_CP)
-src/tools/why3pp_sexp.ml: src/tools/why3pp_sexp-dummy.ml Makefile
-	$(CMP_CP)
-endif
-
 .PHONY: initialize_messages update-parsing-error-handling
 
 # debug optimisation ppx
@@ -1295,15 +1253,7 @@ clean::
 
 ISABELLEVERSIONSPECIFIC=why3.ML Why3_BV.thy Why3_Map.thy
 
-ISABELLEVERSIONSPECIFICTARGETS=$(addprefix lib/isabelle/, $(ISABELLEVERSIONSPECIFIC))
-ISABELLEVERSIONSPECIFICSOURCES=$(addsuffix .@ISABELLEVERSION@, $(ISABELLEVERSIONSPECIFICTARGETS))
-
 ISABELLEREALIZEDRV="%{dep:../../../drivers/isabelle-realize.drv}"
-
-$(ISABELLEVERSIONSPECIFICTARGETS): $(ISABELLEVERSIONSPECIFICSOURCES)
-	for i in $(ISABELLEVERSIONSPECIFIC); do \
-		cp lib/isabelle/$$i.@ISABELLEVERSION@ lib/isabelle/$$i ; \
-	done
 
 clean::
 	rm -f $(ISABELLEVERSIONSPECIFICTARGETS)
@@ -1372,7 +1322,6 @@ update-isabelle: $(GENERATED_PREFIX_ISABELLE)/realizations
 dune: isabelle.dune
 
 ifeq (@enable_isabelle_libs@,yes)
-
 isabelle.dune: Makefile
 	$(SHOW) 'Generate $@'
 	$(HIDE)(echo ";; generated automatically at compilation time"; \
@@ -1408,6 +1357,16 @@ isabelle.dune: Makefile
 	echo "(lib/isabelle/Why3_BV.thy as isabelle/Why3_BV.thy)"; \
 	echo '))'; \
 	) > $@
+
+lib/isabelle/dune: Makefile
+	$(HIDE)mkdir -p lib/isabelle/
+	$(SHOW) 'Generate $@'
+	$(HIDE)(echo ";; generated automatically at compilation time"; \
+	for f in $(ISABELLEVERSIONSPECIFIC); do \
+	echo "(rule (action (copy $$f.@ISABELLEVERSION@ $$f)))"; \
+	done; \
+	) > $@
+
 
 lib/isabelle/int/dune: Makefile
 	$(HIDE)mkdir -p lib/isabelle/int/
@@ -1470,7 +1429,7 @@ lib/isabelle/map/dune: Makefile
 	) > $@
 
 lib/isabelle/list/dune: Makefile
-	$(HIDE)mkdir -p lib/isabelle/bv/
+	$(HIDE)mkdir -p lib/isabelle/list/
 	$(SHOW) 'Generate $@'
 	$(HIDE)(echo ";; generated automatically at compilation time"; \
 	for f in $(ISABELLELIBS_LIST_FILES); do \
@@ -1501,7 +1460,13 @@ lib/isabelle/bv/dune: Makefile
 
 isabelle.dune: drivers/isabelle-realizations.aux lib/isabelle/int/dune lib/isabelle/real/dune \
 	lib/isabelle/set/dune lib/isabelle/map/dune lib/isabelle/list/dune lib/isabelle/option/dune \
-	lib/isabelle/bv/dune lib/isabelle/number/dune lib/isabelle/bool/dune
+	lib/isabelle/bv/dune lib/isabelle/number/dune lib/isabelle/bool/dune lib/isabelle/dune
+
+clean::
+	rm -f lib/isabelle/int/dune lib/isabelle/real/dune			\
+	lib/isabelle/set/dune lib/isabelle/map/dune lib/isabelle/list/dune	\
+	lib/isabelle/option/dune lib/isabelle/bv/dune lib/isabelle/number/dune	\
+	lib/isabelle/bool/dune lib/isabelle/dune
 
 else
 

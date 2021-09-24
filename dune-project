@@ -6,6 +6,8 @@
 (using menhir 2.0)
 (using dune_site 0.1)
 
+(name why3)
+
 (authors
   "François Bobot"
   "Jean-Christophe Filliâtre"
@@ -47,6 +49,7 @@ Why3 is a complete reimplementation of the former Why platform. Among the new fe
   "interactive theorem prover"))
 )
 (package (name why3-ide)
+ (depends why3 lablgtk3 lablgtk3-sourceview3)
 (tags   ("deductive"
   "program verification"
   "formal specification"
@@ -59,7 +62,8 @@ Why3 is a complete reimplementation of the former Why platform. Among the new fe
 Why3 is a complete reimplementation of the former Why platform. Among the new features are: numerous extensions to the input language, a new architecture for calling external provers, and a well-designed API, allowing to use Why3 as a software library. An important emphasis is put on modularity and genericity, giving the end user a possibility to easily reuse Why3 formalizations or to add support for a new external prover if wanted.")
 )
 (package (name why3-coq)
-(tags   ("deductive"
+ (depends why3 coq)
+ (tags   ("deductive"
   "program verification"
   "formal specification"
   "automated theorem prover"
@@ -71,6 +75,7 @@ Why3 is a complete reimplementation of the former Why platform. Among the new fe
 Why3 is a complete reimplementation of the former Why platform. Among the new features are: numerous extensions to the input language, a new architecture for calling external provers, and a well-designed API, allowing to use Why3 as a software library. An important emphasis is put on modularity and genericity, giving the end user a possibility to easily reuse Why3 formalizations or to add support for a new external prover if wanted.")
 )
 (package (name why3-isabelle)
+ (depends why3 coq)
 (tags   ("deductive"
   "program verification"
   "formal specification"

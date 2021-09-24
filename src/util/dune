@@ -20,7 +20,7 @@
           (       -> mlmpfr_wrapper.dummy.ml)
        )
        (select mysexplib.ml from
-          (sexplib -> mysexplib.real.ml)
+          (sexplib sexplib.num -> mysexplib.real.ml)
           (        -> mysexplib.dummy.ml)
        )
        )

@@ -76,8 +76,8 @@
   (public_name why3.cmds.pp)
   (libraries why3
         (select why3pp_sexp.ml from
-           (sexplib -> why3pp_sexp.real.ml)
-           (        -> why3pp_sexp.dummy.ml)
+           (sexplib sexplib.num -> why3pp_sexp.real.ml)
+           (                    -> why3pp_sexp.dummy.ml)
         )
   )
   (modules why3pp why3pp_sexp)

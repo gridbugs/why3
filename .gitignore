@@ -231,3 +231,4 @@ trywhy3.tar.gz
 /isabelle.dune
 /pvs.dune
 /install.dune
+/src/util/config.ml
