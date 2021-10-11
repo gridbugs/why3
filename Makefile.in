@@ -316,8 +316,6 @@ LIBCMX = $(addsuffix .cmx, $(LIBMODULES))
 $(LIBDEP) $(LIBCMO) $(LIBCMX): INCLUDES += $(LIBINCLUDES)
 $(LIBCMX): OFLAGS += -for-pack Why3
 
-$(LIBDEP): $(LIBGENERATED)
-
 .PHONY: initialize_messages update-parsing-error-handling
 
 # debug optimisation ppx
