@@ -4,7 +4,6 @@
         (libraries why3)
         (modules main cmds_location)
  (package why3)
- (promote (until-clean) (into ../../bin))
 )
 
 (generate_sites_module (module cmds_location) (plugins (why3 cmds)))
@@ -16,7 +15,6 @@
   (public_name why3.cmds.config)
   (libraries why3)
   (modules why3config)
-  (flags  -w A-4-9-41-44-45-50-52@5@8@48)
 )
 
 (plugin (name config) (libraries why3.cmds.config) (site (why3 cmds)) (package why3))
@@ -26,7 +24,6 @@
   (public_name why3.cmds.execute)
   (libraries why3)
   (modules why3execute)
-  (flags  -w A-4-9-41-44-45-50-52@5@8@48)
 )
 
 (plugin (name execute) (libraries why3.cmds.execute) (site (why3 cmds)) (package why3))
@@ -36,7 +33,6 @@
   (public_name why3.cmds.extract)
   (libraries why3)
   (modules why3extract)
-  (flags  -w A-4-9-41-44-45-50-52@5@8@48)
 )
 
 (plugin (name extract) (libraries why3.cmds.extract) (site (why3 cmds)) (package why3))
@@ -46,7 +42,6 @@
   (public_name why3.cmds.prove)
   (libraries why3)
   (modules why3prove)
-  (flags  -w A-4-9-41-44-45-50-52@5@8@48)
 )
 
 (plugin (name prove) (libraries why3.cmds.prove) (site (why3 cmds)) (package why3))
@@ -56,7 +51,6 @@
   (public_name why3.cmds.realize)
   (libraries why3)
   (modules why3realize)
-  (flags  -w A-4-9-41-44-45-50-52@5@8@48)
 )
 
 (plugin (name realize) (libraries why3.cmds.realize) (site (why3 cmds)) (package why3))
@@ -66,7 +60,6 @@
   (public_name why3.cmds.wc)
   (libraries why3)
   (modules why3wc)
-  (flags  -w A-4-9-41-44-45-50-52@5@8@48)
 )
 
 (plugin (name wc) (libraries why3.cmds.wc) (site (why3 cmds)) (package why3))
@@ -81,7 +74,6 @@
         )
   )
   (modules why3pp why3pp_sexp)
-  (flags  -w A-4-9-41-44-45-50-52@5@8@48)
 )
 
 (plugin (name pp) (libraries why3.cmds.pp) (site (why3 cmds)) (package why3))
@@ -91,7 +83,6 @@
   (public_name why3.cmds.replay)
   (libraries why3)
   (modules why3replay)
-  (flags  -w A-4-9-41-44-45-50-52@5@8@48)
 )
 
 (plugin (name replay) (libraries why3.cmds.replay) (site (why3 cmds)) (package why3))
@@ -101,7 +92,6 @@
   (public_name why3.cmds.shell)
   (libraries why3)
   (modules why3shell)
-  (flags  -w A-4-9-41-44-45-50-52@5@8@48)
 )
 
 (plugin (name shell) (libraries why3.cmds.shell) (site (why3 cmds)) (package why3))

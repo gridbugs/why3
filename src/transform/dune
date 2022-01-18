@@ -21,6 +21,6 @@
                 intro_vc_vars_counterexmp prepare_for_counterexmp
                 induction induction_pr matching reflection
      )
-     (flags -open Why3_util -open Why3_core -open Why3_mlw -open Why3_parser -open Why3_extract -w A-4-9-41-44-45-50-52@5@8@48)
+     (flags -open Why3_util -open Why3_core -open Why3_mlw -open Why3_parser -open Why3_extract :standard)
      (libraries why3.util why3.core why3.mlw why3.parser why3.extract num)
 )

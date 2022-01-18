@@ -1,6 +1,6 @@
 (library
      (name why3_mlw)
      (public_name why3.mlw)
-     (flags -open Why3_util -open Why3_core -open Why3_driver -w A-4-9-41-44-45-50-52@5@8@48)
+     (flags -open Why3_util -open Why3_core -open Why3_driver :standard)
      (libraries why3.util why3.core why3.driver num unix)
 )

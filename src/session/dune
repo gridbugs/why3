@@ -14,7 +14,7 @@
              (zip -> compress.z.ml)
              (         -> compress.none.ml))
    )
-   (flags -open Why3_util -open Why3_core -open Why3_transform -open Why3_driver -open Why3_parser -open Why3_mlw -w A-4-9-41-44-45-50-52@5@8@48)
+   (flags -open Why3_util -open Why3_core -open Why3_transform -open Why3_driver -open Why3_parser -open Why3_mlw :standard)
 )
 
 

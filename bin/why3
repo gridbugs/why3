@@ -1,1 +1,3 @@
-main.exe
+#!/bin/sh
+
+exec dune exec --no-build --display quiet -- why3 "$@"

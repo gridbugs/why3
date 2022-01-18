@@ -9,7 +9,7 @@
 (library
      (name why3_parser)
      (public_name why3.parser)
-     (flags -open Why3_util -open Why3_core -open Why3_mlw -w A-4-9-41-44-45-50-52@5@8@48)
+     (flags -open Why3_util -open Why3_core -open Why3_mlw :standard)
      (libraries why3.util why3.core why3.mlw num menhirLib)
 )
 
