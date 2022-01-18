@@ -1,3 +1,14 @@
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
+
 open Format
 open Wstdlib
 open Ident
@@ -179,9 +190,6 @@ let purefun_value ~result_ity ~arg_ity mv v =
 
 let unit_value =
   value (ty_tuple []) (Vconstr (Expr.rs_void, [], []))
-
-let undefined_value ity =
-  value (ty_of_ity ity) Vundefined
 
 (**********************************************************************)
 
@@ -700,14 +708,14 @@ type check_value = ity -> value -> unit
 
 type oracle = {
   for_variable:
-    ?check:check_value -> ?loc:Loc.position -> env -> ident -> ity -> value option;
+    env -> ?check:check_value -> loc:Loc.position option -> Ident.ident -> Ity.ity -> value option;
   for_result:
-    ?check:check_value -> env -> Loc.position -> ity -> value option;
+    env -> ?check:check_value -> loc:Loc.position -> call_id:int option -> Ity.ity -> value option;
 }
 
 let oracle_dummy = {
-  for_variable= (fun ?check:_ ?loc:_ _ _ _ -> None);
-  for_result= (fun ?check:_ _ _ _ -> None);
+  for_variable= (fun _ ?check:_ ~loc:_ _ _ -> None);
+  for_result= (fun _ ?check:_ ~loc:_ ~call_id:_ _ -> None);
 }
 
 (******************************************************************************)
@@ -754,11 +762,12 @@ let register_ended env loc =
 (******************************************************************************)
 
 type cntr_ctx = {
-  attr     : attribute;
-  desc     : string option;
-  loc      : Loc.position option;
-  attrs    : Sattr.t;
-  cntr_env : env;
+  attr        : attribute;
+  desc        : string option;
+  loc         : Loc.position option;
+  attrs       : Sattr.t;
+  cntr_env    : env;
+  giant_steps : bool option;
 }
 
 let describe_cntr_ctx ctx =
@@ -794,8 +803,8 @@ let report_cntr fmt (ctx, msg, term) =
     report_cntr_head (ctx, msg, term)
     report_cntr_body (ctx, term)
 
-let mk_cntr_ctx env ?loc ?(attrs=Sattr.empty) ?desc attr : cntr_ctx =
-  { attr; desc; loc; attrs; cntr_env= snapshot_env env }
+let mk_cntr_ctx env ~giant_steps ?loc ?(attrs=Sattr.empty) ?desc attr : cntr_ctx =
+  { attr; desc; loc; attrs; cntr_env= snapshot_env env; giant_steps }
 
 (**********************************************************************)
 
@@ -854,7 +863,7 @@ let check_posts rac ctx v posts =
   with Incomplete reason when rac.ignore_incomplete ->
     Warning.emit "%s.@." reason
 
-let check_type_invs rac ?loc env ity v =
+let check_type_invs rac ?loc ~giant_steps env ity v =
   let ts = match ity.ity_node with
   | Ityapp (ts, _, _) | Ityreg {reg_its= ts} -> ts
   | Ityvar _ -> failwith "check_type_invs: type variable" in
@@ -868,14 +877,14 @@ let check_type_invs rac ?loc env ity v =
       bind_pvs (Opt.get rs.rs_field) (Mrs.find rs fs_vs) env in
     let env = List.fold_left bind_field env def.Pdecl.itd_fields in
     let desc = asprintf "of type %a" print_ity ity in
-    let ctx = mk_cntr_ctx env ?loc:loc ~desc Vc.expl_type_inv in
+    let ctx = mk_cntr_ctx env ?loc:loc ~desc ~giant_steps:(Some giant_steps) Vc.expl_type_inv in
     check_terms rac ctx def.Pdecl.itd_invariant
 
 let opt_or o1 o2 = if o1 <> None then o1 else o2
 
 let value_of_free_vars ctx t =
   let get_value get get_ty env x =
-    let def = undefined_value (ity_of_ty (get_ty x)) in
+    let def = value (get_ty x) Vundefined in
     snapshot (Opt.get_def def (get x env))  in
   let mid = t_v_fold (fun mvs vs ->
     let get_ty vs = vs.vs_ty in
@@ -935,14 +944,14 @@ let check_posts rac ctx v posts =
       (opt_or ctx.loc t.t_loc) (describe_cntr_ctx ctx) mid;
     raise e
 
-let check_assume_type_invs rac ?loc env ity v =
-  try check_type_invs rac ?loc env ity v with Fail (ctx, t) ->
+let check_assume_type_invs rac ?loc ~giant_steps env ity v =
+  try check_type_invs rac ?loc ~giant_steps env ity v with Fail (ctx, t) ->
     stuck_for_fail ctx t
 
 (* Currently, type invariants are only check when creating values or getting
    values from the model. TODO Check type invariants also during execution *)
-let check_type_invs rac ?loc env ity v =
-  try check_type_invs rac ?loc env ity v with Fail (ctx, t) as e ->
+let check_type_invs rac ?loc ~giant_steps env ity v =
+  try check_type_invs rac ?loc ~giant_steps env ity v with Fail (ctx, t) as e ->
     let mid = value_of_free_vars ctx t in
     register_failure ctx.cntr_env
       (opt_or ctx.loc t.t_loc) (describe_cntr_ctx ctx) mid;
@@ -1006,11 +1015,11 @@ let variant_term env olds news =
 let rec relocate loc t =
   t_attr_set ?loc t.t_attrs (TermTF.t_map (fun t -> t) (relocate loc) t)
 
-let check_variant rac expl loc env (old_varl, oldies) varl =
+let check_variant rac expl loc ~giant_steps env (old_varl, oldies) varl =
   let env = {env with vsenv=Mvs.union (fun _ _ v -> Some v) env.vsenv oldies} in
   let loc = match varl with (t,_)::_ when t.t_loc<>None -> t.t_loc | _ -> loc in
   let t = relocate loc (variant_term env old_varl varl) in
-  let ctx = mk_cntr_ctx env expl in
+  let ctx = mk_cntr_ctx env ~giant_steps:(Some giant_steps) expl in
   check_term rac ctx (t_attr_set ?loc (Sattr.singleton expl) t)
 
 (******************************************************************************)
@@ -1189,3 +1198,22 @@ let rec default_value_of_type env ity : value =
             constr_value ity rs fs vs
         | {Pdecl.itd_constructors= []} ->
             value ty Vundefined
+
+let rec undefined_value env ity : value =
+  let ty = ty_of_ity ity in
+  match ity.ity_node with
+  | Ityapp (ts,ityl1,_) when is_ts_tuple ts.its_ts ->
+      let vs = List.map (undefined_value env) ityl1 in
+      constr_value ity (rs_tuple (List.length ityl1)) [] vs
+  | Ityapp (its, l1, l2)
+  | Ityreg { reg_its = its; reg_args = l1; reg_regs = l2 } ->
+      begin match Pdecl.find_its_defn env.pmodule.Pmodule.mod_known its with
+      | { Pdecl.itd_constructors = [rs]; itd_fields = fs } ->
+          let subst = its_match_regs its l1 l2 in
+          let ityl = List.map (fun pv -> pv.pv_ity) rs.rs_cty.cty_args in
+          let tyl = List.map (ity_full_inst subst) ityl in
+          let vs = List.map (undefined_value env) tyl in
+          constr_value ity rs fs vs
+      | _ -> value ty Vundefined
+      end
+  | _ -> value ty Vundefined

@@ -1,3 +1,13 @@
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2021 --  Inria - CNRS - Paris-Saclay University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
 (** {1 Basic definitions for Pinterp and Rac}
 
@@ -16,7 +26,7 @@
 
 (** {3 Values} *)
 
-(** (Mutable) values used in [Pinterp] *)
+(** (Mutable) values used in {!Pinterp} *)
 module rec Value : sig
 
   type float_mode = Mlmpfr_wrapper.mpfr_rnd_t
@@ -90,7 +100,6 @@ val real_value : Big_real.real -> value
 val constr_value : Ity.ity -> Expr.rsymbol -> Expr.rsymbol list -> value list -> value
 val purefun_value : result_ity:Ity.ity -> arg_ity:Ity.ity -> value Mv.t -> value -> value
 val unit_value : value
-val undefined_value : Ity.ity -> value
 
 val range_value : Ity.ity -> BigInt.t -> value option
 (** Returns a range value, or [None] if the value is outside the range. *)
@@ -217,7 +226,7 @@ val multibind_pvs : ?register:(Ident.ident -> value -> unit) ->
 (** {3 Exception for incomplete execution (and RAC)} *)
 
 exception Incomplete of string
-(** Raised when the execution in [Pinterp] is incomplete (not implemented or not
+(** Raised when the execution in {!Pinterp} is incomplete (not implemented or not
     possible), or when a check cannot be decided during the RAC. *)
 
 (** @raise Incomplete with the formatted string as reason *)
@@ -253,9 +262,9 @@ type check_value = Ity.ity -> value -> unit
 
 type oracle = {
   for_variable:
-    ?check:check_value -> ?loc:Loc.position -> env -> Ident.ident -> Ity.ity -> value option;
+    env -> ?check:check_value -> loc:Loc.position option -> Ident.ident -> Ity.ity -> value option;
   for_result:
-    ?check:check_value -> env -> Loc.position -> Ity.ity -> value option;
+    env -> ?check:check_value -> loc:Loc.position -> call_id:int option -> Ity.ity -> value option;
 }
 (** An oracle provides values during execution in {!Pinterp} for program
     parameters and during giant steps. The [check] is called on the value and
@@ -304,17 +313,19 @@ val register_ended : env -> Loc.position option -> unit
 (** {3 The contradiction context} *)
 
 type cntr_ctx = {
-  attr     : Ident.attribute; (** Some attribute [Vc.expl_*] *)
-  desc     : string option;
-  loc      : Loc.position option;
-  attrs    : Ident.Sattr.t;
-  cntr_env : env;
+  attr        : Ident.attribute; (** Some attribute [Vc.expl_*] *)
+  desc        : string option;
+  loc         : Loc.position option;
+  attrs       : Ident.Sattr.t;
+  cntr_env    : env;
+  giant_steps : bool option; (* None in places where it doesn't matter *)
 }
 (** A contradiction context carries all necessary information
     about a contradiction (with snapshot'ed values). *)
 
 val mk_cntr_ctx :
-  env -> ?loc:Loc.position -> ?attrs:Ident.Sattr.t -> ?desc:string ->
+  env -> giant_steps:bool option ->
+  ?loc:Loc.position -> ?attrs:Ident.Sattr.t -> ?desc:string ->
   Ident.attribute -> cntr_ctx
 (** Construct a new {!cntr_ctx} with a snapshot of the environment [env]. *)
 
@@ -327,10 +338,10 @@ val report_cntr : (cntr_ctx * string * Term.term) Pp.pp
 (** {3 Exceptions for failures in RAC} *)
 
 exception Fail of cntr_ctx * Term.term
-(** Invalid assertions raise the exception [Fail] *)
+(** Caused by invalid assertions *)
 
 exception Stuck of cntr_ctx * Loc.position option * string
-(** Invalid assumptions raise the exception [Stuck] *)
+(** Caused by invalid assumptions *)
 
 val stuck : ?loc:Loc.position -> cntr_ctx ->
   ('a, Format.formatter, unit, 'b) format4 -> 'a
@@ -399,11 +410,12 @@ val check_assume_posts : rac -> cntr_ctx -> Value.value -> Ity.post list -> unit
 (** @raise Stuck when one of the postconditions is invalid for the given return
     value. *)
 
-val check_type_invs : rac -> ?loc:Loc.position -> env -> Ity.ity -> Value.value -> unit
+val check_type_invs : rac -> ?loc:Loc.position -> giant_steps:bool ->
+  env -> Ity.ity -> Value.value -> unit
 (** @raise Fail when one of the type invariant of the type is invalid for the
     given value *)
 
-val check_assume_type_invs : rac -> ?loc:Loc.position ->
+val check_assume_type_invs : rac -> ?loc:Loc.position -> giant_steps:bool ->
   env -> Ity.ity -> Value.value -> unit
 (** @raise Stuck when the type invariant for the given type is invalid for the
     given value. *)
@@ -412,12 +424,13 @@ val oldify_varl : env -> (Term.term * Term.lsymbol option) list ->
   (Term.term * Term.lsymbol option) list * Value.value Term.Mvs.t
 (** Prepare a variant for later call with {!check_variant}. *)
 
-val check_variant : rac -> Ident.Sattr.elt -> Loc.position option -> env ->
+val check_variant : rac -> Ident.Sattr.elt -> Loc.position option ->
+  giant_steps:bool -> env ->
   (Term.term * Term.lsymbol option) list * Value.value Term.Mvs.t ->
   (Term.term * Term.lsymbol option) list -> unit
 (** @raise Fail when the variant is invalid. *)
 
-(** {2 Auxilaries} *)
+(** {2 Auxiliaries} *)
 
 val t_undefined : Ty.ty -> Term.term
 
@@ -441,6 +454,8 @@ val debug_array_as_update_chains_not_epsilon : Debug.flag
     As an update chain, it is instead converted into a formula:
 
     [(make n undefined)[0 <- a[0]]... [n-1 <- a[n-1]]]. *)
+
+val undefined_value : env -> Ity.ity -> value
 
 (**/**)
 

@@ -95,7 +95,7 @@ let compare_model_const c1 c2 = match c1, c2 with
   | Decimal _, _ -> -1 | _, Decimal _ -> 1
   | Fraction f1, Fraction f2 -> (match BigInt.compare f1.frac_nom f2.frac_nom with 0 -> BigInt.compare f1.frac_den f2.frac_den | n -> n)
 
-let compare_model_value v1 v2 = match v1, v2 with
+let compare_model_value_const v1 v2 = match v1, v2 with
   | Const c1, Const c2 -> compare_model_const c1 c2
   | Const _, _ -> -1 | _, Const _ -> 1
   | _ -> 0
@@ -281,7 +281,7 @@ let rec convert_model_value value : Json_base.json =
 
 and convert_array a =
   let m_others = ["others", convert_model_value a.arr_others] in
-  let cmp_ix i1 i2 = compare_model_value i1.arr_index_key i2.arr_index_key in
+  let cmp_ix i1 i2 = compare_model_value_const i1.arr_index_key i2.arr_index_key in
   convert_indices (List.sort cmp_ix a.arr_indices) @ [Json_base.Record m_others]
 
 and convert_indices indices =
@@ -366,7 +366,7 @@ let rec print_array_human fmt (arr : model_array) =
     let {arr_index_key= key; arr_index_value= v} = arr in
     fprintf fmt "@[%a =>@ %a@]" print_model_value_human key
       print_model_value_human v in
-  let sort_ix i1 i2 = compare_model_value i1.arr_index_key i2.arr_index_key in
+  let sort_ix i1 i2 = compare_model_value_const i1.arr_index_key i2.arr_index_key in
   fprintf fmt "@[(%a%a)@]"
     (Pp.print_list_delim ~start:Pp.nothing ~stop:Pp.comma ~sep:Pp.comma
        print_key_val)
@@ -520,13 +520,24 @@ let search_model_element_for_id m ?loc id =
     then Some me else None in
   search_model_element m p
 
-let search_model_element_call_result model loc =
-  let p me = (* [@model_trace:result] [@call_result_loc:<loc>] *)
+let matching_call_id id attrs =
+  Opt.equal Int.equal (Some id)
+    (search_attribute_value get_call_id_value attrs)
+
+let matching_call_result_loc attrs loc =
+  Opt.equal Loc.equal (Some loc)
+    (search_attribute_value get_call_result_loc attrs)
+
+let search_model_element_call_result model call_id loc =
+  let p me = (* [@model_trace:result] [@call_result_loc:<loc>] [@RAC:call_id:<id>] *)
     let has_model_trace_result attrs =
       get_model_trace_string ~name:"" ~attrs = "result" in
-    if has_model_trace_result me.me_name.men_attrs &&
-       let oloc = search_attribute_value get_call_result_loc me.me_name.men_attrs in
-       Opt.equal Loc.equal oloc (Some loc)
+    if (match call_id with
+        | Some call_id ->
+            matching_call_id call_id me.me_name.men_attrs
+        | None ->
+            has_model_trace_result me.me_name.men_attrs &&
+            matching_call_result_loc me.me_name.men_attrs loc)
     then Some me else None in
   search_model_element model p
 
@@ -552,9 +563,12 @@ let print_model_element ?(print_locs=false) ~print_attrs ~print_model_value ~me_
                (Pp.print_option_or_default "NO LOC "Pretty.print_loc) m_element.me_location)
         print_model_value m_element.me_value
 
+let find_call_id = Ident.search_attribute_value Ident.get_call_id_value
+
 let similar_model_element_names n1 n2 =
   Ident.get_model_trace_string ~name:n1.men_name ~attrs:n1.men_attrs
   = Ident.get_model_trace_string ~name:n2.men_name ~attrs:n2.men_attrs &&
+  Opt.equal (=) (find_call_id n1.men_attrs) (find_call_id n2.men_attrs) &&
   n1.men_kind = n2.men_kind &&
   Strings.has_suffix unused_suffix n1.men_name =
   Strings.has_suffix unused_suffix n2.men_name
@@ -1011,31 +1025,6 @@ let build_model_rec pm (elts: model_element list) : model_files =
     Sattr.fold add_written_loc me.me_name.men_attrs model in
   List.fold_left add_model_elt Mstr.empty (Lists.map_filter process_me elts)
 
-let handle_contradictory_vc vc_term_loc model_files =
-  (* The VC is contradictory if the location of the term that triggers VC
-     was collected, model_files is not empty, and there are no model elements
-     in this location.
-     If this is the case, add model element saying that VC is contradictory
-     to this location. *)
-  if Mstr.is_empty model_files then
-    (* If the counterexample model was not collected, then model_files
-       is empty and this does not mean that VC is contradictory. *)
-    model_files
-  else match vc_term_loc with
-    | None -> model_files
-    | Some pos ->
-        let filename, line_number, _, _ = Loc.get pos in
-        let model_file = get_model_file model_files filename in
-        match get_elements model_file line_number with
-        | [] ->
-            (* The vc is contradictory, add special model element  *)
-            let me = create_model_element
-                ~name:"the check fails with all inputs"
-                ~value:(Unparsed "contradictory vc")
-                ~attrs:Sattr.empty in
-            let me = {me with me_location= Some pos} in
-            add_to_model_if_loc ~kind:Error_message me model_files
-        | _ -> model_files
 
 (*
 ***************************************************************
@@ -1183,7 +1172,6 @@ let model_parser (raw: raw_model_parser) : model_parser =
   raw pm str |> debug_elements |> (* Eg for "smtv2": Smtv2_model_parser.parse *)
   build_model_rec pm |> debug_files "before" |>
   map_filter_model_files !clean#element |> debug_files "after" |>
-  handle_contradictory_vc pm.Printer.vc_term_loc |>
   fun model_files -> { model_files; vc_term_loc; vc_term_attrs }
 
 exception KnownModelParser of string
